@@ -24,8 +24,8 @@ public class GameManager : MonoBehaviour {
 		var mapGen = new MapGenerator(oreNum: 50);
 		mapGen.generateOres (
 			genFunc: (pos, ore) => {
-				var v3 = new Vector3 (pos.x, 0, pos.y);
-				Instantiate (orePrefab, v3, Quaternion.identity);
+				var oreObject = Instantiate (orePrefab);
+				oreObject.GetComponent <Ore>().init(pos,ore);
 			},
 			randomPosInScene: this.randomPosInScene
 		);
