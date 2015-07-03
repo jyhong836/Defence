@@ -16,26 +16,23 @@ public class Miner : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		List<Ore> oreToRemoveList = new List<Ore> ();
-		foreach(Ore ore in oreList) {
-			if (ore.oreLeft<=0) {
-				oreToRemoveList.Add(ore);
-			} else {
-				oreTemp += (oreCollectSpeed*Time.deltaTime);
-//				Debug.Log("temp"+oreTemp);
-				if (oreTemp>=oreUpdateSpeed) {
-					int oreAdd = (int)oreTemp;
-					oreTemp -= oreAdd;
-					oreAdd = (ore.oreLeft<oreAdd)?ore.oreLeft:oreAdd;
-					ore.oreLeft -= oreAdd;
-					oreCollect += oreAdd;
-					Debug.Log(ore.oreLeft);
-				}
-			}
-		}
-		foreach (Ore ore in oreToRemoveList) {
+		if (oreList.Count==0)
+			return;
+		Ore ore = oreList[0];
+		if (ore.oreLeft<=0) {
+			Debug.Log("remove one ore, "+oreCollect+" idx: "+oreList.IndexOf(ore));
 			oreList.Remove(ore);
-			Debug.Log("remove one ore, "+oreCollect);
+			oreTemp = 0;
+		} else {
+			oreTemp += (oreCollectSpeed*Time.deltaTime);
+			if (oreTemp>=oreUpdateSpeed) {
+				int oreAdd = (int)oreTemp;
+				oreTemp -= oreAdd;
+				oreAdd = (ore.oreLeft<oreAdd)?ore.oreLeft:oreAdd;
+				ore.oreLeft -= oreAdd;
+				oreCollect += oreAdd;
+				Debug.Log(ore.oreLeft);
+			}
 		}
 	}
 
@@ -43,7 +40,7 @@ public class Miner : MonoBehaviour {
 		if (other.tag == "Ore") {
 			Vector3 OrePosition = other.gameObject.transform.position;
 			Ore o1 = other.gameObject.GetComponent<Ore>();
-			Debug.Log ("find one ore in "+OrePosition+" with "+o1.oreLeft+" ores");
+//			Debug.Log ("find one ore in "+OrePosition+" with "+o1.oreLeft+" ores");
 			oreList.Add(o1);
 		}
 	}
