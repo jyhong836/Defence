@@ -16,7 +16,8 @@ public class Miner : MonoBehaviour {
 	float oreTemp = 0;
 	Action<int> oreCollected;
 
-	public void init(Action<int> oreCollected){
+	public void init(Vector2 pos,Action<int> oreCollected){
+		transform.position = Vector3Extension.fromVec2 (pos);
 		this.oreCollected = oreCollected;
 	}
 		
@@ -55,6 +56,7 @@ public class Miner : MonoBehaviour {
 		if (currentTarget != null) {
 			var start = transform.position;
 			var end = currentTarget.transform.position;
+
 			Debug.DrawLine (start,end,Color.yellow);
 		}
 	}
