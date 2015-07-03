@@ -10,10 +10,12 @@ namespace AssemblyCSharpEditorvs
 	{
 		[Test]
 		public void tryChangeOreTests(){
-			var control = new ResourceControl (50);
+			var invokedUpdate = false;
+			var control = new ResourceControl (50,v=> invokedUpdate = true);
 
 			Assert.That (control.tryChangeOre (0));
 			Assert.That (control.ore,Is.EqualTo (50));
+			Assert.That (invokedUpdate);
 
 			Assert.That (control.tryChangeOre (50));
 			Assert.That (control.ore,Is.EqualTo(100));

@@ -1,17 +1,21 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
+
+	public Text oreText;
 
 	[SerializeField] private float mapSize = 10f;
 
 	[SerializeField] private GameObject orePrefab;
 
-
+	ResourceControl resourceControl;
 
 	// Use this for initialization
 	void Start () {
+		resourceControl = new ResourceControl (initOre: 200, updateOre: v=> oreText.text = string.Format ("Ore: {0}",v) );
 		generateMap ();
 	}
 	
