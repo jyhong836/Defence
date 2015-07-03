@@ -18,10 +18,10 @@ public class GameManager : MonoBehaviour {
 		resourceControl = new ResourceControl (initOre: 200, updateOre: v=> oreText.text = string.Format ("Ore: {0}",v) );
 		generateMap ();
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
-	
+
 	}
 
 	void generateMap(){
@@ -42,4 +42,3 @@ public class GameManager : MonoBehaviour {
 	}
 
 }
-	
