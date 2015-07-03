@@ -12,12 +12,12 @@ public class MapGenerator {
 		this.oreNum = oreNum;
 	}
 
-	float randomOreNum(){
+	int randomOreNum(){
 		var x = UnityEngine.Random.value;
-		return minOreValue + x * x * (maxOreValue - minOreValue);
+		return (int)(minOreValue + x * x * (maxOreValue - minOreValue));
 	}
 
-	public void generateOres(Action<Vector2,float> genFunc,Func<Vector2> randomPosInScene){
+	public void generateOres(Action<Vector2,int> genFunc,Func<Vector2> randomPosInScene){
 
 		for (int i = 0; i < oreNum; i++) {
 			var pos = randomPosInScene ();
