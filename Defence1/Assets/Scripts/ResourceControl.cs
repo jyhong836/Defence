@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using System.Diagnostics;
 
 /// <summary>
 /// Use 'Control' instead of 'Manager' to indecate that this is not a Monobehavior.
@@ -33,6 +34,22 @@ public class ResourceControl{
 			return true;
 		}else{
 			return false;
+		}
+	}
+
+	public bool tryCostOre(Towers t){
+		return tryChangeOre ( -priceOf (t));
+	}
+
+	public int priceOf(Towers t){
+		switch(t){
+		case Towers.None:
+			return 0;
+		case Towers.Miner:
+			return 50;
+
+		default:
+			throw new UnityException ();
 		}
 	}
 

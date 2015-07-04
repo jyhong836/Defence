@@ -1,23 +1,29 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class UIManager : MonoBehaviour {
 	public GameManager gManager;
+	public Text oreText;
+	public Text warningText;
 
-	[SerializeField] PreviewState _placementState = PreviewState.None;
+	[SerializeField] Towers _placementState = Towers.None;
+	[SerializeField] float fadeOutTime = 2;
+
 	Preview previewTower;
 
-	public PreviewState previewState{
+	public Towers previewState{
 		get{ return _placementState;}
 		set{
 			if(value != _placementState){
 				_placementState = value;
 				switch(value){
-				case PreviewState.None:
+				case Towers.None:
 					Destroy (previewTower.gameObject);
 					previewTower = null;
 					break;
-				case PreviewState.Miner:
+				case Towers.Miner:
 					previewTower = makePreview (gManager.minerPrefab.gameObject);
 					break;
 				}
@@ -36,7 +42,7 @@ public class UIManager : MonoBehaviour {
 
 
 	public void MinerButtonClicked(){
-		previewState = PreviewState.Miner;
+		previewState = Towers.Miner;
 	}
 
 	Preview makePreview(GameObject prefab){
@@ -71,31 +77,54 @@ public class UIManager : MonoBehaviour {
 
 	void handleCancelation(){
 		if(Input.GetButtonDown ("Cancel")){
-			previewState = PreviewState.None;
+			previewState = Towers.None;
 		}
 	}
 
 	void handleTowerPlacement() {
 		if(Input.GetButtonUp ("LeftClick") && previewTower != null && previewTower.valid){
+			if (gManager.resourceControl.tryCostOre (previewState)) {
 
-			var pos = previewTower.transform.position;
+				var pos = previewTower.transform.position;
 
-			switch(previewState){
-			case PreviewState.Miner:
-				gManager.createMiner (new Vector2(pos.x,pos.z));
-				break;
-			default:
-				throw new UnityException ("Don't know what to create!");
+				switch (previewState) {
+				case Towers.Miner:
+					gManager.createMiner (new Vector2 (pos.x, pos.z));
+					break;
+				default:
+					throw new UnityException ("Don't know what to create!");
+				}
+			}else{
+				var price = gManager.resourceControl.priceOf (previewState);
+				warning (string.Format ("You need at least {0} ore to place this tower.", price));
 			}
 
 		}
 	}
 
-	/// <summary>
-	/// Represent which tower will be added next.
-	/// </summary>
-	public enum PreviewState{
-		None,
-		Miner
+	Coroutine fadeCoroutine;
+	void warning(string info){
+		warningText.text = info;
+		warningText.color = warningText.color.withAlpha (1f);
+		if(fadeCoroutine != null) {
+			StopCoroutine (fadeCoroutine);
+		}
+		fadeCoroutine = StartCoroutine (fadeOutWarningText());
 	}
+
+	IEnumerator fadeOutWarningText(){
+		var timePast = 0f;
+		while(timePast<fadeOutTime){
+			warningText.color = warningText.color.withAlpha (1f - timePast/fadeOutTime);
+			yield return null;
+			timePast += Time.deltaTime;
+		}
+	}
+		
+}
+
+
+public enum Towers{
+	None,
+	Miner
 }
