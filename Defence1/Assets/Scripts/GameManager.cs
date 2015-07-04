@@ -43,6 +43,16 @@ public class GameManager : MonoBehaviour {
 		return new Vector2 (x, y);
 	}
 
+	public Vector2 randomPosAtBound(){
+		var x = mapSize * (UnityEngine.Random.value - 0.5f);
+		var y = mapSize * (UnityEngine.Random.value - 0.5f);
+		if (UnityEngine.Random.value > 0.5)
+			x = mapSize*(0.5f - (float)Math.Round(UnityEngine.Random.value));
+		else 
+			y = mapSize*(0.5f - (float)Math.Round(UnityEngine.Random.value));
+		return new Vector2 (x, y);
+	}
+
 	public Miner createMiner(Vector2 pos){
 		var miner = Instantiate (minerPrefab);
 		miner.init (pos: pos, oreCollected: delta => resourceControl.tryChangeOre (delta));
