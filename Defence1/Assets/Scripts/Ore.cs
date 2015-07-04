@@ -3,22 +3,23 @@ using System.Collections;
 
 public class Ore : MonoBehaviour {
 	
-	[SerializeField] int ore;
+	[SerializeField] float ore;
 	
 	const float radiusFactor = 0.5f;
 	
-	public int oreLeft{
+	public float oreLeft{
 		get{ return ore; }
 		set{ 
 			ore = value;
-			if(ore<=0){
+			if (ore <= 0) {
 				destroySelf ();
+			} else {
+				ajustRadiusAccordingToOre ();
 			}
-			ajustRadiusAccordingToOre ();
 		}
 	}
 	
-	public void init(Vector2 pos, int ore){
+	public void init(Vector2 pos, float ore){
 		this.ore = ore;
 		transform.position = new Vector3(pos.x,0,pos.y);
 	}

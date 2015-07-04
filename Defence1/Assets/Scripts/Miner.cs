@@ -5,50 +5,33 @@ using System;
 
 public class Miner : MonoBehaviour {
 
-	List<Ore> oreList = new List<Ore>();
-//	int oreCollect = 0;
 	public float oreCollectSpeed = 2; 
-	public float oreUpdateSpeed = 2;
+	public float oreUpdateInterval = 0.5f;
 	public float workingRadius = 6;
 
 	[SerializeField] Ore currentTarget;
+	[SerializeField] bool finishedWorking = false;
 
-	float oreTemp = 0;
-	Action<int> oreCollected;
+	float oreTemp;
+	Action<int> collectCallback;
 
-	public void init(Vector2 pos,Action<int> oreCollected){
+
+	public void init(Vector2 pos, Action<int> oreCollected){
 		transform.position = Vector3Extension.fromVec2 (pos);
-		this.oreCollected = oreCollected;
+		this.collectCallback = oreCollected;
 	}
 		
 	void Start () {
-		detectOres (); // only detect ores once here. Be careful, this method should be called after ores have shown to take effect.
+		changeCurrentTarget ();
 	}
 	
 	// Game Mechanisms should be included into FixedUpdate.
 	void FixedUpdate () {
-		if (oreList.Count==0)
-			return;
-		Ore ore = oreList[0];
-		if (ore.oreLeft<=0) {
-//			Debug.Log("remove one ore, "+oreCollect+" idx: "+oreList.IndexOf(ore));
-			oreList.Remove(ore);
-			oreTemp = 0;
-			currentTarget = null;
-		} else {
-			currentTarget = ore;
-			oreTemp += (oreCollectSpeed*Time.deltaTime);
-			if (oreTemp>=oreUpdateSpeed) {
-				int oreAdd = (int)oreTemp;
-				oreTemp -= oreAdd;
-				oreAdd = (ore.oreLeft<oreAdd)?ore.oreLeft:oreAdd;
-				ore.oreLeft -= oreAdd;
-
-				if (oreCollected != null) {
-					oreCollected (oreAdd); // we allow it to be null for prefab testing.
-				}
-//				Debug.Log(ore.oreLeft);
-			}
+		if(! finishedWorking){
+			if(currentTarget.oreLeft >0 ) 
+				collectFromTarget ();
+			else 
+				changeCurrentTarget ();
 		}
 	}
 
@@ -61,11 +44,28 @@ public class Miner : MonoBehaviour {
 		}
 	}
 
-	void detectOres(){
+	void collectFromTarget(){
+		var amount = Mathf.Min (currentTarget.oreLeft, oreCollectSpeed * Time.fixedDeltaTime);
+		currentTarget.oreLeft -= (amount + 1e-5f);
+		oreTemp += amount;
+
+		if(oreTemp >= oreCollectSpeed * oreUpdateInterval){
+			var send = (int)oreTemp;
+			collectCallback (send);
+			oreTemp -= send;
+		}
+	}
+
+	void changeCurrentTarget(){
 		var colliders = Physics.OverlapSphere (transform.position,workingRadius,Masks.Ore);
-		foreach(var c in colliders){
-			var ore = c.gameObject.GetComponent <Ore>();
-			oreList.Add (ore);
+		if(colliders.Length > 0){
+			//random pick one
+			var index = UnityEngine.Random.Range (0, colliders.Length);
+			var ore = colliders [index].gameObject.GetComponent <Ore>();
+			currentTarget = ore;
+		}else{
+			currentTarget = null;
+			finishedWorking = true;
 		}
 	}
 
