@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour {
 	public Text oreText;
 
 	public float mapSize = 10f;
+	public GameObject emptyPrefab;
 	public GameObject orePrefab;
 	public Miner minerPrefab;
 
@@ -25,9 +26,12 @@ public class GameManager : MonoBehaviour {
 
 	void generateMap(){
 		var mapGen = new MapGenerator(oreNum: 50);
+		var oreParent = Instantiate<GameObject> (emptyPrefab);
+		oreParent.name = "Ores";
 		mapGen.generateOres (
 			genFunc: (pos, ore) => {
 				var oreObject = Instantiate (orePrefab);
+				oreObject.transform.parent = oreParent.transform;
 				oreObject.GetComponent <Ore>().init(pos,ore);
 			},
 			randomPosInScene: this.randomPosInScene
