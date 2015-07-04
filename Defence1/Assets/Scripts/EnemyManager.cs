@@ -13,7 +13,7 @@ public class EnemyManager : MonoBehaviour {
 		if (startGenerate)
 			if (nextEnemyTime <= 0) {
 				createEnemy (gameManager.randomPosAtBound ());
-				nextEnemyTime = Random.value * enemyUpdateInterval;
+				nextEnemyTime += Random.value * enemyUpdateInterval;
 			} else {
 				nextEnemyTime -= Time.fixedDeltaTime;
 			}
