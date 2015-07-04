@@ -11,13 +11,14 @@ public class GameManager : MonoBehaviour {
 	public GameObject emptyPrefab;
 	public GameObject orePrefab;
 	public Miner minerPrefab;
-
 	public ResourceControl resourceControl { get; private set;}
+	public bool shouldGenerateMap = true;
 
 	// Use this for initialization
 	void Start () {
 		resourceControl = new ResourceControl (initOre: 200, updateOre: v=> uiManager.oreText.text = string.Format ("Ore: {0}",v) );
-		generateMap ();
+		if(shouldGenerateMap)
+			generateMap ();
 	}
 
 	// Update is called once per frame
