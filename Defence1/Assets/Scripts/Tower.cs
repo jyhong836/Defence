@@ -7,7 +7,7 @@ public enum TowerMode {
 	AttackOnce // whill attack until out of power, not resume.
 }
 
-public class Tower : MonoBehaviour {
+public class Tower : TowerParent {
 	
 	public float attackingRadius = 6;
 	
@@ -38,7 +38,7 @@ public class Tower : MonoBehaviour {
 	// power
 	private bool isOutOfPower = false; // TODO true;
 	[SerializeField] float power = 0;
-	public float powerLeft {
+	public override float powerLeft {
 		get { return power; }
 		set {
 			power = value;
@@ -67,6 +67,8 @@ public class Tower : MonoBehaviour {
 	}
 	
 	public void init(Vector2 pos){
+		initParent (pos);
+
 		transform.position = Vector3Extension.fromVec2 (pos);
 	}
 
@@ -144,4 +146,11 @@ public class Tower : MonoBehaviour {
 			isAttacking = false;
 		}
 	}
+
+	#region implemented abstract members of TowerParent
+	public override float maxPower ()
+	{
+		return 50;
+	}
+	#endregion
 }

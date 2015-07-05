@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-public class Miner : MonoBehaviour {
-
+public class Miner : TowerParent {
+	
 	public float oreCollectSpeed = 2; 
 	public float oreUpdateInterval = 0.5f;
 	public float workingRadius = 6;
@@ -17,6 +17,8 @@ public class Miner : MonoBehaviour {
 
 
 	public void init(Vector2 pos, Action<int> oreCollected){
+		initParent (pos);
+
 		transform.position = Vector3Extension.fromVec2 (pos);
 		this.collectCallback = oreCollected;
 	}
@@ -69,4 +71,9 @@ public class Miner : MonoBehaviour {
 		}
 	}
 
+	#region implemented abstract members of TowerParent
+	public override float maxPower () {
+		return 100;
+	}
+	#endregion
 }

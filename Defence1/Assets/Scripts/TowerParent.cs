@@ -6,17 +6,19 @@ public abstract class TowerParent : MonoBehaviour {
 	public bool destroyed { get; private set;}
 	public EnergyNode energyNode { get; private set;} //The embeded enrgyNode for every building.
 
-	public float powerLeft = 0;
+	public virtual float powerLeft { get; set;}
 
 	public abstract float maxPower ();
 
 	public void destroySelf (GameManager manager){
-		cleanUp (manager);
+		if (!destroyed) {
+			cleanUp (manager);
 
-		energyNode.clearAllConnections ();
+			energyNode.clearAllConnections ();
 
-		destroyed = true;
-		Destroy (gameObject);
+			destroyed = true;
+			Destroy (gameObject);
+		}
 	}
 
 	protected virtual void cleanUp(GameManager manager) {} 
@@ -43,11 +45,4 @@ public abstract class TowerParent : MonoBehaviour {
 		return amount - powerGet;
 	}
 
-	/// <summary>
-	/// Destroy all the active part of this tower, just for preview use.
-	/// </summary>
-	public void turnToPreviewModel(){
-		Destroy (energyNode);
-		Destroy (this);
-	}
 }

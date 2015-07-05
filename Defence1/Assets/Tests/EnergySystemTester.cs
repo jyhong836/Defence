@@ -5,7 +5,7 @@ public class EnergySystemTester : MonoBehaviour {
 
 	public GameManager gameManager;
 
-	PowerStation station;
+	Generator station;
 
 	// Use this for initialization
 	void Start () {
@@ -13,7 +13,7 @@ public class EnergySystemTester : MonoBehaviour {
 		gameManager.createPowerRedirector (new Vector2(-10,5));
 
 		station = gameManager.createPowerStation (new Vector2(-15f, 2));
-		StartCoroutine (destroyStationLater ());
+//		StartCoroutine (destroyStationLater ());
 	}
 
 	IEnumerator destroyStationLater(){

@@ -18,24 +18,31 @@ public class UIManager : MonoBehaviour {
 		set{
 			if(value != _placementState){
 				_placementState = value;
+				if (previewTower != null)
+					Destroy (previewTower.gameObject);
 				switch(value){
 				case Towers.None:
-					Destroy (previewTower.gameObject);
 					previewTower = null;
 					break;
 				case Towers.Miner:
-					previewTower = makePreview (gManager.minerPrefab.gameObject);
+					previewTower = makePreview (gManager.minerPrefab);
 					break;
 				case Towers.Tower:
-					previewTower = makePreviewTower (gManager.towerPrefab.gameObject);
+					previewTower = makePreview (gManager.towerPrefab);
 					break;
+				case Towers.Generator:
+					previewTower = makePreview (gManager.generatorPrefab);
+					break;
+				case Towers.Redirector:
+					previewTower = makePreview (gManager.redirectorPrefab);
+					break;
+				default:
+					throw new UnityException ("Unknow Preview State.");
 				}
 			}
 		}
 	}
-
-
-	void Start () { }
+		
 
 	void Update () {
 		handleMousePoint ();
@@ -51,9 +58,17 @@ public class UIManager : MonoBehaviour {
 		previewState = Towers.Miner;
 	}
 
-	Preview makePreview(GameObject prefab){
-		var obj = Instantiate (prefab);
-		destroyOptionally (obj.GetComponent<Miner> ());
+	public void GeneratorButtonClicked(){
+		previewState = Towers.Generator;
+	}
+
+	public void RedirectorButtonClicked(){
+		previewState = Towers.Redirector;
+	}
+		
+	Preview makePreview<T> (T prefab) where T: TowerParent{
+		var obj = Instantiate (prefab.gameObject);
+		destroyOptionally (obj.GetComponent<T> ());
 
 		var r = obj.AddComponent <Rigidbody>();
 		r.isKinematic = true;
@@ -61,19 +76,8 @@ public class UIManager : MonoBehaviour {
 
 		return preview;
 	}
-	
-	Preview makePreviewTower(GameObject prefab){
-		var obj = Instantiate (prefab);
-		destroyOptionally (obj.GetComponent<Tower> ());
-		
-		var r = obj.AddComponent <Rigidbody>();
-		r.isKinematic = true;
-		var preview = obj.AddComponent <Preview>();
-		
-		return preview;
-	}
 
-	void destroyOptionally(MonoBehaviour b){
+	void destroyOptionally(Object b){
 		if(b!=null){
 			Destroy (b);
 		}
@@ -147,5 +151,7 @@ public class UIManager : MonoBehaviour {
 public enum Towers{
 	None,
 	Miner,
-	Tower
+	Tower,
+	Generator,
+	Redirector
 }
