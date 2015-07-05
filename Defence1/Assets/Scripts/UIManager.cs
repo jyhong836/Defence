@@ -106,7 +106,6 @@ public class UIManager : MonoBehaviour {
 	void handleTowerPlacement() {
 		if(Input.GetButtonUp ("LeftClick") && previewTower != null && previewTower.valid){
 			if (gManager.resourceControl.tryCostOre (previewState)) {
-
 				var pos = previewTower.transform.position;
 				var v2 = new Vector2 (pos.x, pos.z);
 

@@ -19,6 +19,15 @@ public class EnergyNode : MonoBehaviour {
 		this.tower = tower;
 		setupConnections ();
 	}
+
+	static readonly Color connectionColor = new Color(0.3f,0.3f,1.0f);
+	void Update(){
+		var start = transform.position;
+		targetNodes.ForEach (n=>{
+			var end = n.transform.position;
+			Debug.DrawLine (start,end,connectionColor);
+		});
+	}
 		
 
 	void setupConnections() {

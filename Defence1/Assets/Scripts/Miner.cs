@@ -5,12 +5,14 @@ using System;
 
 public class Miner : TowerParent {
 	
-	public float oreCollectSpeed = 2; 
-	public float oreUpdateInterval = 0.5f;
-	public float workingRadius = 6;
+	public static readonly float oreCollectSpeed = 2; 
+	public static readonly float oreUpdateInterval = 0.5f;
+	public static readonly float workingRadius = 6;
+	public static readonly float energyConsumingSpeed = 10;
 
 	[SerializeField] Ore currentTarget;
 	[SerializeField] bool finishedWorking = false;
+	[SerializeField] bool hasEnoughEnergy = false;
 
 	float oreTemp;
 	Action<int> collectCallback;
@@ -38,7 +40,7 @@ public class Miner : TowerParent {
 	}
 
 	void Update(){
-		if (currentTarget != null) {
+		if (currentTarget != null && hasEnoughEnergy) {
 			var start = transform.position;
 			var end = currentTarget.transform.position;
 
@@ -47,14 +49,21 @@ public class Miner : TowerParent {
 	}
 
 	void collectFromTarget(){
-		var amount = Mathf.Min (currentTarget.oreLeft, oreCollectSpeed * Time.fixedDeltaTime);
-		currentTarget.oreLeft -= (amount + 1e-5f);
-		oreTemp += amount;
+		var de = energyConsumingSpeed * Time.fixedDeltaTime;
+		hasEnoughEnergy = powerLeft > de;
 
-		if(oreTemp >= oreCollectSpeed * oreUpdateInterval){
-			var send = (int)oreTemp;
-			collectCallback (send);
-			oreTemp -= send;
+		if (hasEnoughEnergy) {
+			powerLeft -= de;
+			
+			var amount = Mathf.Min (currentTarget.oreLeft, oreCollectSpeed * Time.fixedDeltaTime);
+			currentTarget.oreLeft -= (amount + 1e-5f);
+			oreTemp += amount;
+
+			if (oreTemp >= oreCollectSpeed * oreUpdateInterval) {
+				var send = (int)oreTemp;
+				collectCallback (send);
+				oreTemp -= send;
+			}
 		}
 	}
 
