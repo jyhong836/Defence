@@ -1,17 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PowerStation : MonoBehaviour {
+public class PowerStation : TowerParent {
 
+	public void init(Vector2 pos){
+		initParent ();
 
-
-	// Use this for initialization
-	void Start () {
-	
+		transform.position = Vector3Extension.fromVec2 (pos);
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+
+
+
 }
