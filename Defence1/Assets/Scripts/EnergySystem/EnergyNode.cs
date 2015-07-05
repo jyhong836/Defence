@@ -10,8 +10,7 @@ public class EnergyNode : MonoBehaviour {
 	List<EnergyNode> targetNodes = new List<EnergyNode>();
 	Func<float,float> energyArrived;
 
-	public void init(Vector2 pos, Func<float,float> energyArriveCallback){
-		transform.position = Vector3Extension.fromVec2 (pos);
+	public void init(Func<float,float> energyArriveCallback){
 		this.energyArrived = energyArriveCallback;
 		setupConnections ();
 	}
