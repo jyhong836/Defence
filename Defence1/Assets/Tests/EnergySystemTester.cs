@@ -6,6 +6,8 @@ public class EnergySystemTester : MonoBehaviour {
 	public GameManager gameManager;
 	public EnergyNode nodePrefab;
 
+	PowerStation station;
+
 	// Use this for initialization
 	void Start () {
 		var n1 = Instantiate (nodePrefab);
@@ -21,7 +23,13 @@ public class EnergySystemTester : MonoBehaviour {
 			return e - 1f;
 		});
 
-		var station = gameManager.createPowerStation (new Vector2(-15f, 2));
+		station = gameManager.createPowerStation (new Vector2(-15f, 2));
+
+	}
+
+	IEnumerator destroyStationLayer(){
+		yield return new WaitForSeconds (4);
+
 	}
 	
 	// Update is called once per frame

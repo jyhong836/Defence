@@ -9,6 +9,14 @@ public abstract class TowerParent : MonoBehaviour {
 
 	public abstract float maxPower ();
 
+	public void destroySelf (GameManager manager){
+		cleanUp ();
+
+		Destroy (gameObject);
+	}
+
+	protected virtual void cleanUp() {} 
+
 	/// <summary>
 	/// Remember to call this method first in every child's init.
 	/// </summary>
