@@ -3,6 +3,7 @@ using System.Collections;
 
 public abstract class TowerParent : MonoBehaviour {
 
+	public bool destroyed { get; private set;}
 	public EnergyNode energyNode { get; private set;} //The embeded enrgyNode for every building.
 
 	public float powerLeft = 0;
@@ -12,6 +13,9 @@ public abstract class TowerParent : MonoBehaviour {
 	public void destroySelf (GameManager manager){
 		cleanUp (manager);
 
+		energyNode.clearAllConnections ();
+
+		destroyed = true;
 		Destroy (gameObject);
 	}
 
@@ -23,7 +27,7 @@ public abstract class TowerParent : MonoBehaviour {
 	protected void initParent(Vector2 pos){
 		this.setPos (pos.x,pos.y);
 		energyNode = gameObject.AddComponent <EnergyNode>();
-		energyNode.init (energyArrive);
+		energyNode.init (energyArrive,this);
 	}
 
 	/// <summary>

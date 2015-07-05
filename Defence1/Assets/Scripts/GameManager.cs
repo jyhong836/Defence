@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour {
 	public Miner minerPrefab;
 	public Tower towerPrefab;
 	public PowerStation powerStationPrefab;
+	public PowerRedirector redirectorPrefab;
 
 	public ResourceControl resourceControl { get; private set;}
 	public bool shouldGenerateMap = true;
@@ -73,6 +74,12 @@ public class GameManager : MonoBehaviour {
 		var station = Instantiate (powerStationPrefab);
 		station.init (pos);
 		return station;
+	}
+
+	public PowerRedirector createPowerRedirector(Vector2 pos){
+		var r = Instantiate (redirectorPrefab);
+		r.init (pos);
+		return r;
 	}
 
 }

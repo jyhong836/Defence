@@ -7,11 +7,16 @@ public class EnergyNode : MonoBehaviour {
 
 	public static readonly float transmissionRadius = 10;
 
+	public TowerParent tower;
+
 	[SerializeField] List<EnergyNode> targetNodes = new List<EnergyNode>();
 	Func<float,float> energyArrived;
 
-	public void init(Func<float,float> energyArriveCallback){
+	public void init(Func<float,float> energyArriveCallback, TowerParent tower){
+		if (tower == null)
+			throw new ArgumentNullException ("tower");
 		this.energyArrived = energyArriveCallback;
+		this.tower = tower;
 		setupConnections ();
 	}
 		
@@ -27,8 +32,18 @@ public class EnergyNode : MonoBehaviour {
 		}
 	}
 
+	public void clearAllConnections() {
+		targetNodes.ForEach (n => n.dropConnectionTo (this));
+	}
+
 	public void connectTo(EnergyNode node){
 		targetNodes.Add (node);
+	}
+
+	public void dropConnectionTo(EnergyNode node){
+		var removed = targetNodes.Remove (node);
+		if (!removed)
+			Debug.Log ("removing error in EnergyNode!");
 	}
 
 	public void energyPointArrived(EnergyPoint point){
