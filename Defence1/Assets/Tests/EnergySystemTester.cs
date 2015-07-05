@@ -12,7 +12,7 @@ public class EnergySystemTester : MonoBehaviour {
 		gameManager.createPowerRedirector (new Vector2(-10,0));
 		gameManager.createPowerRedirector (new Vector2(-10,5));
 
-		station = gameManager.createPowerStation (new Vector2(-15f, 2));
+		station = gameManager.createGenerator (new Vector2(-15f, 2));
 //		StartCoroutine (destroyStationLater ());
 	}
 

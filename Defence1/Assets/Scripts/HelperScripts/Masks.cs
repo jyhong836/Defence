@@ -7,4 +7,5 @@ public static class Masks {
 	public static readonly int Enemy = LayerMask.GetMask ("Enemy");
 	public static readonly int Tower = LayerMask.GetMask ("Tower");
 	public static readonly int EnergySystem = LayerMask.GetMask ("Energy System");
+	public static readonly int Preview = 31;//LayerMask.GetMask ("Preview");
 }

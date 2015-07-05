@@ -49,6 +49,10 @@ public class ResourceControl{
 			return 50;
 		case Towers.Tower:
 			return 50;
+		case Towers.Generator:
+			return 100;
+		case Towers.Redirector:
+			return 10;
 
 		default:
 			throw new UnityException ();

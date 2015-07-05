@@ -70,7 +70,7 @@ public class GameManager : MonoBehaviour {
 		return tower;
 	}
 
-	public Generator createPowerStation(Vector2 pos){
+	public Generator createGenerator(Vector2 pos){
 		var station = Instantiate (generatorPrefab);
 		station.init (pos);
 		return station;

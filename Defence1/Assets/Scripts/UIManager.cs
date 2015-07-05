@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
-using System.Collections.Generic;
+using System;
 
 public class UIManager : MonoBehaviour {
 	public GameManager gManager;
@@ -18,7 +18,7 @@ public class UIManager : MonoBehaviour {
 		set{
 			if(value != _placementState){
 				_placementState = value;
-				if (previewTower != null)
+				if (previewTower != null) 
 					Destroy (previewTower.gameObject);
 				switch(value){
 				case Towers.None:
@@ -69,6 +69,7 @@ public class UIManager : MonoBehaviour {
 	Preview makePreview<T> (T prefab) where T: TowerParent{
 		var obj = Instantiate (prefab.gameObject);
 		destroyOptionally (obj.GetComponent<T> ());
+		obj.name = "Preview Model";
 
 		var r = obj.AddComponent <Rigidbody>();
 		r.isKinematic = true;
@@ -77,7 +78,7 @@ public class UIManager : MonoBehaviour {
 		return preview;
 	}
 
-	void destroyOptionally(Object b){
+	void destroyOptionally(UnityEngine.Object b){
 		if(b!=null){
 			Destroy (b);
 		}
@@ -107,23 +108,39 @@ public class UIManager : MonoBehaviour {
 			if (gManager.resourceControl.tryCostOre (previewState)) {
 
 				var pos = previewTower.transform.position;
+				var v2 = new Vector2 (pos.x, pos.z);
 
-				switch (previewState) {
-				case Towers.Miner:
-					gManager.createMiner (new Vector2 (pos.x, pos.z));
-					break;
-				case Towers.Tower:
-					gManager.createTower (new Vector2 (pos.x, pos.z));
-					break;
-				default:
-					throw new UnityException ("Don't know what to create!");
-				}
+				hidePreviewTowerWhileDoingThisAction (() => { //must hide the preview, or its layer will become a trouble.
+					switch (previewState) {
+					case Towers.Redirector:
+						gManager.createPowerRedirector (v2);
+						break;
+					case Towers.Miner:
+						gManager.createMiner (v2);
+						break;
+					case Towers.Tower:
+						gManager.createTower (v2);
+						break;
+					case Towers.Generator:
+						gManager.createGenerator (v2);
+						break;
+					default:
+						throw new UnityException ("Don't know what to create!");
+					}
+				});
+		
 			}else{
 				var price = gManager.resourceControl.priceOf (previewState);
 				warning (string.Format ("You need at least {0} ore to place this tower.", price));
 			}
 
 		}
+	}
+
+	void hidePreviewTowerWhileDoingThisAction(Action doSomething){
+		previewTower.gameObject.SetActive (false);
+		doSomething ();
+		previewTower.gameObject.SetActive (true);
 	}
 
 	Coroutine fadeCoroutine;
