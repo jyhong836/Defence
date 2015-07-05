@@ -65,6 +65,10 @@ public class Tower : MonoBehaviour {
 			}
 		}
 	}
+	
+	public void init(Vector2 pos){
+		transform.position = Vector3Extension.fromVec2 (pos);
+	}
 
 	void FixedUpdate () {
 		if (isAttacking) {
