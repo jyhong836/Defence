@@ -26,6 +26,9 @@ public class UIManager : MonoBehaviour {
 				case Towers.Miner:
 					previewTower = makePreview (gManager.minerPrefab.gameObject);
 					break;
+				case Towers.Tower:
+					previewTower = makePreviewTower (gManager.towerPrefab.gameObject);
+					break;
 				}
 			}
 		}
@@ -39,7 +42,10 @@ public class UIManager : MonoBehaviour {
 		handleCancelation ();
 		handleTowerPlacement ();
 	}
-
+	
+	public void TowerButtonClicked(){
+		previewState = Towers.Tower;
+	}
 
 	public void MinerButtonClicked(){
 		previewState = Towers.Miner;
@@ -53,6 +59,17 @@ public class UIManager : MonoBehaviour {
 		r.isKinematic = true;
 		var preview = obj.AddComponent <Preview>();
 
+		return preview;
+	}
+	
+	Preview makePreviewTower(GameObject prefab){
+		var obj = Instantiate (prefab);
+		destroyOptionally (obj.GetComponent<Tower> ());
+		
+		var r = obj.AddComponent <Rigidbody>();
+		r.isKinematic = true;
+		var preview = obj.AddComponent <Preview>();
+		
 		return preview;
 	}
 
@@ -91,6 +108,9 @@ public class UIManager : MonoBehaviour {
 				case Towers.Miner:
 					gManager.createMiner (new Vector2 (pos.x, pos.z));
 					break;
+				case Towers.Tower:
+					gManager.createTower (new Vector2 (pos.x, pos.z));
+					break;
 				default:
 					throw new UnityException ("Don't know what to create!");
 				}
@@ -126,5 +146,6 @@ public class UIManager : MonoBehaviour {
 
 public enum Towers{
 	None,
-	Miner
+	Miner,
+	Tower
 }

@@ -47,6 +47,8 @@ public class ResourceControl{
 			return 0;
 		case Towers.Miner:
 			return 50;
+		case Towers.Tower:
+			return 50;
 
 		default:
 			throw new UnityException ();
