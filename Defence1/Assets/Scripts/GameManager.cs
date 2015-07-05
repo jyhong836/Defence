@@ -12,6 +12,8 @@ public class GameManager : MonoBehaviour {
 	public GameObject orePrefab;
 	public Miner minerPrefab;
 	public Tower towerPrefab;
+	public PowerStation powerStationPrefab;
+
 	public ResourceControl resourceControl { get; private set;}
 	public bool shouldGenerateMap = true;
 
@@ -65,6 +67,13 @@ public class GameManager : MonoBehaviour {
 		var tower = Instantiate (towerPrefab);
 		tower.init (pos);
 		return tower;
-	}	
+	}
+
+	public PowerStation createPowerStation(Vector2 pos){
+		var station = Instantiate (powerStationPrefab);
+		station.init (pos);
+		return station;
+	}
+
 }
 

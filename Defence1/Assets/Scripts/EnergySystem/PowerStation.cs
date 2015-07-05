@@ -12,9 +12,8 @@ public class PowerStation : TowerParent {
 	float outputTimer = 0;
 	
 	public void init(Vector2 pos){
-		initParent ();
+		initParent (pos);
 
-		transform.position = Vector3Extension.fromVec2 (pos);
 	}
 
 	void FixedUpdate() {
@@ -27,6 +26,7 @@ public class PowerStation : TowerParent {
 	void outputPower() {
 		var point = Instantiate (energyPointPrefab);
 		point.init (outputAmount,energyNode);
+		point.transform.position = transform.position;
 		outputTimer -= outputInterval;
 	}
 

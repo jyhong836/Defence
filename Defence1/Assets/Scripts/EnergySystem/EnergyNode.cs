@@ -7,7 +7,7 @@ public class EnergyNode : MonoBehaviour {
 
 	public static readonly float transmissionRadius = 10;
 
-	List<EnergyNode> targetNodes = new List<EnergyNode>();
+	[SerializeField] List<EnergyNode> targetNodes = new List<EnergyNode>();
 	Func<float,float> energyArrived;
 
 	public void init(Func<float,float> energyArriveCallback){
