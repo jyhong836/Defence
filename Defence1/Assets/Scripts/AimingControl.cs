@@ -38,7 +38,7 @@ public class HorizontalRotationAimingControl: AimingControl{
 		direction = initDirection;
 	}
 
-	float targetRelativeToThis(){
+	public float targetRelativeToThis(){
 		return RotationMath.approachingAngle (direction, targetDirection ());
 	}
 		

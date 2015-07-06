@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 using System;
+using UnityEngine.EventSystems;
 
 public class UIManager : MonoBehaviour {
 	public GameManager gManager;
@@ -104,7 +105,7 @@ public class UIManager : MonoBehaviour {
 	}
 
 	void handleTowerPlacement() {
-		if(Input.GetButtonUp ("LeftClick") && previewTower != null && previewTower.valid){
+		if(Input.GetButtonUp ("LeftClick") && previewTower != null && previewTower.valid && !EventSystem.current.IsPointerOverGameObject()) {
 			if (gManager.resourceControl.tryCostOre (previewState)) {
 				var pos = previewTower.transform.position;
 				var v2 = new Vector2 (pos.x, pos.z);
@@ -159,6 +160,7 @@ public class UIManager : MonoBehaviour {
 			yield return null;
 			timePast += Time.deltaTime;
 		}
+	
 	}
 		
 }
