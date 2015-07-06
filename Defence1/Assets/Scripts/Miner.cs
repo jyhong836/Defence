@@ -16,6 +16,7 @@ public class Miner : TowerParent {
 
 	float oreTemp;
 	Action<int> collectCallback;
+	AimingControl aimControl;
 
 
 	public void init(Vector2 pos, Action<int> oreCollected){
@@ -23,6 +24,7 @@ public class Miner : TowerParent {
 
 		transform.position = Vector3Extension.fromVec2 (pos);
 		this.collectCallback = oreCollected;
+
 	}
 		
 	void Start () {
