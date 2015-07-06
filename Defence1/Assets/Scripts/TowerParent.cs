@@ -3,7 +3,8 @@ using System.Collections;
 
 public abstract class TowerParent : MonoBehaviour {
 
-	public bool destroyed { get; private set;}
+	public bool destroyed { get{ return !alive;}}
+	public bool alive { get; private set;}
 	public EnergyNode energyNode { get; private set;} //The embeded enrgyNode for every building.
 
 	public virtual float powerLeft { get; set;}
@@ -11,12 +12,12 @@ public abstract class TowerParent : MonoBehaviour {
 	public abstract float maxPower ();
 
 	public void destroySelf (GameManager manager){
-		if (!destroyed) {
+		if (alive) {
 			cleanUp (manager);
 
 			energyNode.clearAllConnections ();
 
-			destroyed = true;
+			alive = false;
 			Destroy (gameObject);
 		}
 	}
@@ -31,6 +32,7 @@ public abstract class TowerParent : MonoBehaviour {
 	/// Remember to call this method first in every child's init.
 	/// </summary>
 	protected void initParent(Vector2 pos){
+		alive = true;
 		this.setPos (pos.x,pos.y);
 		energyNode = gameObject.AddComponent <EnergyNode>();
 		energyNode.init (energyArrive,this);

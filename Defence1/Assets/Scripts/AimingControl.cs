@@ -37,12 +37,16 @@ public class HorizontalRotationAimingControl: AimingControl{
 
 		direction = initDirection;
 	}
+
+	float targetRelativeToThis(){
+		return RotationMath.approachingAngle (direction, targetDirection ());
+	}
 		
 
 	#region AimingControl implementation
 	public void updateOrientation (float dt) {
 		if(hasTarget()){
-			var needRotate = targetDirection () - direction;
+			var needRotate = targetRelativeToThis ();
 			var maxCanRotate = dt * rotateSpeed();
 			float delta;
 			if(Mathf.Abs (needRotate) < maxCanRotate){
@@ -58,8 +62,10 @@ public class HorizontalRotationAimingControl: AimingControl{
 			if (!hasTarget ())
 				return true;
 			else
-				return Mathf.Abs (targetDirection() - direction) < fireAngle();
+				return Mathf.Abs (targetRelativeToThis()) < fireAngle();
 		}
 	}
 	#endregion
+
 }
+	
