@@ -21,6 +21,10 @@ public abstract class TowerParent : MonoBehaviour {
 		}
 	}
 
+	public void destroySelf(){
+		destroySelf (GameManager.Get);
+	}
+
 	protected virtual void cleanUp(GameManager manager) {} 
 
 	/// <summary>

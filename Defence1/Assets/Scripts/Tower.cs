@@ -61,7 +61,7 @@ public class Tower : TowerParent {
 		set {
 			life = value;
 			if (life<=0) {
-				Destroy(gameObject);
+				destroySelf ();
 			}
 		}
 	}
