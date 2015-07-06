@@ -10,6 +10,7 @@ public class Miner : TowerParent {
 	public static readonly float workingRadius = 6;
 	public static readonly float energyConsumingSpeed = 10;
 
+	public Transform rotationPart;
 	[SerializeField] Ore currentTarget;
 	[SerializeField] bool finishedWorking = false;
 	[SerializeField] bool hasEnoughEnergy = false;
@@ -22,9 +23,15 @@ public class Miner : TowerParent {
 	public void init(Vector2 pos, Action<int> oreCollected){
 		initParent (pos);
 
-		transform.position = Vector3Extension.fromVec2 (pos);
 		this.collectCallback = oreCollected;
-
+		aimControl = 
+			new HorizontalRotationAimingControl (
+			rotateSpeed: () => 1f,
+			fireAngle: () => 0.01f,
+			rotateToDirection: RotationMath.RotatePart (rotationPart, 0f),
+			hasTarget: () => !finishedWorking,
+			targetDirection: () => RotationMath.directionOf (currentTarget.getPos () - this.getPos ())
+		);
 	}
 		
 	void Start () {
@@ -51,10 +58,12 @@ public class Miner : TowerParent {
 	}
 
 	void collectFromTarget(){
+		aimControl.updateOrientation (Time.fixedDeltaTime);
+
 		var de = energyConsumingSpeed * Time.fixedDeltaTime;
 		hasEnoughEnergy = powerLeft > de;
 
-		if (hasEnoughEnergy) {
+		if (aimControl.ready && hasEnoughEnergy) {
 			powerLeft -= de;
 			
 			var amount = Mathf.Min (currentTarget.oreLeft, oreCollectSpeed * Time.fixedDeltaTime);
