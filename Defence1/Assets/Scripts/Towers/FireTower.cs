@@ -5,6 +5,8 @@ using System.Collections;
 /// Fire tower, a range attacking tower.
 /// </summary>
 public class FireTower : Tower {
+
+
 	protected override float AttackTarget () {
 		var colliders = Physics.OverlapSphere (transform.position, attackingRadius, Masks.Enemy);
 		if (colliders.Length > 0) {
