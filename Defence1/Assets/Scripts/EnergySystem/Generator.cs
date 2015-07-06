@@ -6,9 +6,6 @@ public class Generator : TowerParent {
 	public readonly static float outputInterval = 2;
 	public readonly static float outputAmount = 100;
 
-
-	public EnergyPoint energyPointPrefab;
-
 	float outputTimer = 0;
 	
 	public void init(Vector2 pos){
@@ -24,9 +21,11 @@ public class Generator : TowerParent {
 	}
 
 	void outputPower() {
-		var point = Instantiate (energyPointPrefab);
+		var manager = GameManager.Get;
+		var point = Instantiate (manager.energyPointPrefab);
 		point.init (outputAmount,energyNode);
 		point.transform.position = transform.position;
+		point.transform.parent = manager.energyPointParent.transform;
 		outputTimer -= outputInterval;
 	}
 

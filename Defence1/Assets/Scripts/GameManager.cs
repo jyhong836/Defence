@@ -4,33 +4,56 @@ using System.Collections;
 using System;
 
 public class GameManager : MonoBehaviour {
-
+	static GameManager singleton;
+	static bool singletonSet;
+	public static GameManager Get{
+		get{ return singleton; }
+		set{
+			if (singletonSet)
+				throw new UnityException ("Singleton already set!!");
+			else{
+				singletonSet = true;
+				singleton = value;
+			}
+		}
+	}
 
 	public UIManager uiManager;
 	public float mapSize = 10f;
+
+	//Prefabs-----------
 	public GameObject emptyPrefab;
 	public GameObject orePrefab;
 	public Miner minerPrefab;
 	public Tower towerPrefab;
 	public Generator generatorPrefab;
 	public PowerRedirector redirectorPrefab;
+	public EnergyPoint energyPointPrefab;
+	//Prefabs----------------
+
+	public bool shouldGenerateMap = true;
 
 	public ResourceControl resourceControl { get; private set;}
-	public bool shouldGenerateMap = true;
+	public GameObject energyPointParent { get; private set;}
 
 	// Use this for initialization
 	void Start () {
+		Get = this; //setup singleton.
+
 		resourceControl = new ResourceControl (initOre: 200, updateOre: v=> uiManager.oreText.text = string.Format ("Ore: {0}",v) );
+		setupParents ();
 		if(shouldGenerateMap)
 			generateMap ();
 	}
 
-	// Update is called once per frame
-	void Update () { }
+	void setupParents(){
+		energyPointParent = Instantiate (emptyPrefab);
+		energyPointParent.name = "Energy Points";
+	}
 
 	void generateMap(){
 		var mapGen = new MapGenerator(oreNum: 50);
-		var oreParent = Instantiate<GameObject> (emptyPrefab);
+		var oreParent = Instantiate (emptyPrefab);
 		oreParent.name = "Ores";
 		mapGen.generateOres (
 			genFunc: (pos, ore) => {
@@ -81,6 +104,6 @@ public class GameManager : MonoBehaviour {
 		r.init (pos);
 		return r;
 	}
-
+		
 }
 
