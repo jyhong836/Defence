@@ -6,10 +6,11 @@ using System;
 public class EnergyNode : MonoBehaviour {
 
 	public static readonly float transmissionRadius = 10;
+	static readonly Color connectionColor = new Color(0.3f,0.3f,1.0f);
 
 	public TowerParent tower;
 
-	[SerializeField] List<EnergyNode> targetNodes = new List<EnergyNode>();
+	public List<EnergyNode> targetNodes = new List<EnergyNode>();
 	Func<float,float> energyArrived;
 
 	public void init(Func<float,float> energyArriveCallback, TowerParent tower){
@@ -20,7 +21,6 @@ public class EnergyNode : MonoBehaviour {
 		setupConnections ();
 	}
 
-	static readonly Color connectionColor = new Color(0.3f,0.3f,1.0f);
 	void Update(){
 		var start = transform.position;
 		targetNodes.ForEach (n=>{
@@ -73,4 +73,5 @@ public class EnergyNode : MonoBehaviour {
 			point.destroySelf ();
 		}
 	}
+		
 }

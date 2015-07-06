@@ -17,8 +17,7 @@ public class GameManager : MonoBehaviour {
 			}
 		}
 	}
-
-	public UIManager uiManager;
+		
 	public float mapSize = 10f;
 
 	//Prefabs-----------
@@ -40,7 +39,7 @@ public class GameManager : MonoBehaviour {
 	void Start () {
 		Get = this; //setup singleton.
 
-		resourceControl = new ResourceControl (initOre: 200, updateOre: v=> uiManager.oreText.text = string.Format ("Ore: {0}",v) );
+		resourceControl = new ResourceControl (initOre: 200, updateOre: v=> UIManager.Get.oreText.text = string.Format ("Ore: {0}",v) );
 		setupParents ();
 		if(shouldGenerateMap)
 			generateMap ();

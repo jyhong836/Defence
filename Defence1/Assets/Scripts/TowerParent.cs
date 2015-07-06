@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.EventSystems;
 
 public abstract class TowerParent : MonoBehaviour {
 
@@ -50,5 +51,18 @@ public abstract class TowerParent : MonoBehaviour {
 		powerLeft += powerGet;
 		return amount - powerGet;
 	}
+
+//	void OnMouseEnter(){
+//		energyNode.showConnections ();
+//		showInfoOnMap ();
+//	}
+//
+//	void OnMouseExit(){
+//		energyNode.hideConnections ();
+//		hideInfoOnMap ();
+//	}
+//
+//	protected virtual void showInfoOnMap() { }
+//	protected virtual void hideInfoOnMap() { }
 
 }

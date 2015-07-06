@@ -44,6 +44,9 @@ public class UIManager : MonoBehaviour {
 		}
 	}
 		
+	void Start () {
+		Get = this;
+	}
 
 	void Update () {
 		handleMousePoint ();
@@ -79,7 +82,7 @@ public class UIManager : MonoBehaviour {
 		return preview;
 	}
 
-	void destroyOptionally(UnityEngine.Object b){
+	public static void destroyOptionally(UnityEngine.Object b){
 		if(b!=null){
 			Destroy (b);
 		}
@@ -161,6 +164,20 @@ public class UIManager : MonoBehaviour {
 			timePast += Time.deltaTime;
 		}
 	
+	}
+
+	static UIManager singleton;
+	static bool singletonSet;
+	public static UIManager Get{
+		get{ return singleton; }
+		set{
+			if (singletonSet)
+				throw new UnityException ("UI Singleton already set!!");
+			else{
+				singletonSet = true;
+				singleton = value;
+			}
+		}
 	}
 		
 }
