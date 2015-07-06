@@ -52,17 +52,4 @@ public abstract class TowerParent : MonoBehaviour {
 		return amount - powerGet;
 	}
 
-//	void OnMouseEnter(){
-//		energyNode.showConnections ();
-//		showInfoOnMap ();
-//	}
-//
-//	void OnMouseExit(){
-//		energyNode.hideConnections ();
-//		hideInfoOnMap ();
-//	}
-//
-//	protected virtual void showInfoOnMap() { }
-//	protected virtual void hideInfoOnMap() { }
-
 }

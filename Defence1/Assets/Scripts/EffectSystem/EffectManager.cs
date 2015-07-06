@@ -43,19 +43,6 @@ public class EffectManager : MonoBehaviour {
 		}
 	}
 
-	// Don't know where the bug is. GetChild will trigger errors.
-//	void clearPointOverObject(){
-//		var n = pointOverEffectObject.transform.childCount;
-//		Debug.Log ("Child Count: "+n );
-//		var allChilden = new List<Transform> ();
-//		for (int i = 0; i < n; i++) {
-//			allChilden.Add (pointOverEffectObject.transform.GetChild (n));
-//		}
-//
-//		allChilden.ForEach (Destroy);
-//		pointOverEffectObject.transform.DetachChildren ();
-//	}
-
 	void clearPointOverObject() {
 		if(pointOverEffectObject.transform.childCount != 0){
 			Destroy(pointOverEffectObject.gameObject);
