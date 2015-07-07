@@ -4,8 +4,8 @@ using System.Collections;
 public class Ore : MonoBehaviour {
 	
 	[SerializeField] float ore;
-	
-	const float radiusFactor = 0.5f;
+
+	public static readonly float radiusFactor = 0.5f;
 	
 	public float oreLeft{
 		get{ return ore; }
@@ -35,12 +35,11 @@ public class Ore : MonoBehaviour {
 	}
 
 	void ajustRadiusAccordingToOre(){
-		var radius = radiusFactor * Mathf.Pow (ore, 0.33333f);
+		var radius = radiusOfAmount (ore);
 		transform.localScale = Vector3Extension.vectorOf(radius);
 	}
 
-	
-	// Update is called once per frame
-	void Update () {
+	public static float radiusOfAmount(float amount){
+		return radiusFactor * Mathf.Pow (amount, 0.33333f);
 	}
 }

@@ -2,11 +2,13 @@
 using System.Collections;
 using UnityEngine.UI;
 using System;
+using UnityEngine.EventSystems;
 
 public class UIManager : MonoBehaviour {
 	public GameManager gManager;
 	public Text oreText;
 	public Text warningText;
+	public RangePreview rangePreviewPrefab;
 
 	[SerializeField] Towers _placementState = Towers.None;
 	[SerializeField] float fadeOutTime = 2;
@@ -43,6 +45,9 @@ public class UIManager : MonoBehaviour {
 		}
 	}
 		
+	void Start () {
+		Get = this;
+	}
 
 	void Update () {
 		handleMousePoint ();
@@ -70,15 +75,20 @@ public class UIManager : MonoBehaviour {
 		var obj = Instantiate (prefab.gameObject);
 		destroyOptionally (obj.GetComponent<T> ());
 		obj.name = "Preview Model";
+		obj.tag = "Preview";
 
 		var r = obj.AddComponent <Rigidbody>();
 		r.isKinematic = true;
+
+		var rangePreview = Instantiate (rangePreviewPrefab);
+		rangePreview.init (obj.transform,EnergyNode.transmissionRadius);
+
 		var preview = obj.AddComponent <Preview>();
 
 		return preview;
 	}
 
-	void destroyOptionally(UnityEngine.Object b){
+	public static void destroyOptionally(UnityEngine.Object b){
 		if(b!=null){
 			Destroy (b);
 		}
@@ -104,7 +114,7 @@ public class UIManager : MonoBehaviour {
 	}
 
 	void handleTowerPlacement() {
-		if(Input.GetButtonUp ("LeftClick") && previewTower != null && previewTower.valid){
+		if(Input.GetButtonUp ("LeftClick") && previewTower != null && previewTower.valid && !EventSystem.current.IsPointerOverGameObject()) {
 			if (gManager.resourceControl.tryCostOre (previewState)) {
 				var pos = previewTower.transform.position;
 				var v2 = new Vector2 (pos.x, pos.z);
@@ -158,6 +168,21 @@ public class UIManager : MonoBehaviour {
 			warningText.color = warningText.color.withAlpha (1f - timePast/fadeOutTime);
 			yield return null;
 			timePast += Time.deltaTime;
+		}
+	
+	}
+
+	static UIManager singleton;
+	static bool singletonSet;
+	public static UIManager Get{
+		get{ return singleton; }
+		set{
+			if (singletonSet)
+				throw new UnityException ("UI Singleton already set!!");
+			else{
+				singletonSet = true;
+				singleton = value;
+			}
 		}
 	}
 		

@@ -15,7 +15,7 @@ public static class RotationMath {
 	}
 
 	/// <summary>
-	/// A1 A2 should be between 0 and 2Pi
+	/// A1， A2 should be between 0 and 2Pi
 	/// </summary>
 	/// <returns>The angle.</returns>
 	/// <param name="a1">A1.</param>
