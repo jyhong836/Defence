@@ -102,6 +102,24 @@ public class GameManager : MonoBehaviour {
 		tower.init (pos);
 		return tower;
 	}
+	
+	public Tower createLaserTower(Vector2 pos){
+		var tower = Instantiate (laserTowerPrefab);
+		tower.init (pos);
+		return tower;
+	}
+	
+	public Tower createCannonTower(Vector2 pos){
+		var tower = Instantiate (cannonTowerPrefab);
+		tower.init (pos);
+		return tower;
+	}
+	
+	public Tower createFireTower(Vector2 pos){
+		var tower = Instantiate (fireTowerPrefab);
+		tower.init (pos);
+		return tower;
+	}
 
 	public Generator createGenerator(Vector2 pos){
 		var station = Instantiate (generatorPrefab);

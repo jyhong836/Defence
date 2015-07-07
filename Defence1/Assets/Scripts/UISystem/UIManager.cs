@@ -150,6 +150,15 @@ public class UIManager : MonoBehaviour {
 					case Towers.Tower:
 						gManager.createTower (v2);
 						break;
+					case Towers.LaserTower:
+						gManager.createLaserTower (v2);
+						break;
+					case Towers.CannonTower:
+						gManager.createCannonTower (v2);
+						break;
+					case Towers.FireTower:
+						gManager.createFireTower (v2);
+						break;
 					case Towers.Generator:
 						gManager.createGenerator (v2);
 						break;

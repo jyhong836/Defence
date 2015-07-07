@@ -49,6 +49,12 @@ public class ResourceControl{
 			return 50;
 		case Towers.Tower:
 			return 50;
+		case Towers.LaserTower:
+			return 50;
+		case Towers.CannonTower:
+			return 50;
+		case Towers.FireTower:
+			return 50;
 		case Towers.Generator:
 			return 100;
 		case Towers.Redirector:
