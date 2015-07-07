@@ -115,6 +115,7 @@ public class Tower : TowerParent {
 
 	// Use this for initialization
 	void Start () {
+		isAttacking = true; // FIXME attack start at begining
 		ChangeCurrentTarget ();
 		nextAttackTime = attackInterval;
 	}
@@ -139,6 +140,7 @@ public class Tower : TowerParent {
 		}
 	}
 
+	// control the attack time
 	protected void Attack () {
 		if (nextAttackTime <= 0) {
 			nextAttackTime += AttackTarget();
@@ -155,11 +157,9 @@ public class Tower : TowerParent {
 	protected virtual float AttackTarget () {
 		if (currentTarget == null || currentTarget.lifeLeft <= 0 || isTargetOutOfRange) {
 			ChangeCurrentTarget ();
-			Debug.Log("change target"+isTargetOutOfRange);
 		} else if (aimControl.ready) {
 			currentTarget.lifeLeft -= injury;
 			isFiring = true;
-			Debug.Log("injury");
 			return attackInterval;
 		} else 
 			aimControl.updateOrientation (Time.fixedDeltaTime);
@@ -171,20 +171,19 @@ public class Tower : TowerParent {
 	/// Changes the current target to a new enemy.
 	/// </summary>
 	/// <returns>Time for rotate to new target or 0.</returns>
-	protected bool ChangeCurrentTarget () {
-		// FIXME wrong detect range radius
+	protected virtual bool ChangeCurrentTarget () {
 		var colliders = Physics.OverlapSphere (transform.position,attackingRadius,Masks.Enemy);
 		if (colliders.Length > 0) {
 			//random pick one
 			var index = UnityEngine.Random.Range (0, colliders.Length);
 			var enemy = colliders [index].gameObject.GetComponent <Enemy>();
 			currentTarget = enemy;
-			isAttacking = true;
+//			isAttacking = true;
 
 			return true;
 		} else {
 			currentTarget = null;
-			isAttacking = false;
+//			isAttacking = false;
 			return false;
 		}
 	}
