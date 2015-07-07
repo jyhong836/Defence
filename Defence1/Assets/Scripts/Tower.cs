@@ -9,17 +9,19 @@ public enum TowerMode {
 
 public class Tower : TowerParent {
 	
-	[SerializeField] Enemy currentTarget;
+	[SerializeField] protected Enemy currentTarget;
 	protected bool isTargetOutOfRange {
 		get {
 			if (currentTarget==null)
-				return false;
+				return true;
 			Vector2 start = this.gameObject.getPos();
 			start -= currentTarget.gameObject.getPos();
-			return start.sqrMagnitude > attackingRadius;
+//			Debug.Log(start.sqrMagnitude+" " + attackingRadius);
+			return start.magnitude > attackingRadius;
 		}
 	}
-	public bool isAttacking = false;
+	protected bool isAttacking = false;
+	protected virtual bool isFiring{ get; set; }
 	
 	[SerializeField] protected float attackingRadius = 6;
 	[SerializeField] protected float idlePowerUsage = 0.001f; // per sec
@@ -142,6 +144,7 @@ public class Tower : TowerParent {
 			nextAttackTime += AttackTarget();
 		} else {
 			nextAttackTime -= Time.fixedDeltaTime;
+			isFiring = false;
 		}
 	}
 
@@ -152,11 +155,15 @@ public class Tower : TowerParent {
 	protected virtual float AttackTarget () {
 		if (currentTarget == null || currentTarget.lifeLeft <= 0 || isTargetOutOfRange) {
 			ChangeCurrentTarget ();
+			Debug.Log("change target"+isTargetOutOfRange);
 		} else if (aimControl.ready) {
 			currentTarget.lifeLeft -= injury;
+			isFiring = true;
+			Debug.Log("injury");
 			return attackInterval;
 		} else 
 			aimControl.updateOrientation (Time.fixedDeltaTime);
+		isFiring = false;
 		return 0;
 	}
 
@@ -165,6 +172,7 @@ public class Tower : TowerParent {
 	/// </summary>
 	/// <returns>Time for rotate to new target or 0.</returns>
 	protected bool ChangeCurrentTarget () {
+		// FIXME wrong detect range radius
 		var colliders = Physics.OverlapSphere (transform.position,attackingRadius,Masks.Enemy);
 		if (colliders.Length > 0) {
 			//random pick one

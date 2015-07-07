@@ -23,6 +23,7 @@ public class Miner : TowerParent {
 				_isFiring = value;
 				miningLaser.showEffect = value;
 				if(value){
+					Debug.Log("shoot");
 					miningLaser.setEndpoints (firePoint, currentTarget.transform.position);
 				}
 			}
