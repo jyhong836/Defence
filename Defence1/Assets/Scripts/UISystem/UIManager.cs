@@ -32,6 +32,15 @@ public class UIManager : MonoBehaviour {
 				case Towers.Tower:
 					previewTower = makePreview (gManager.towerPrefab);
 					break;
+				case Towers.LaserTower:
+					previewTower = makePreview (gManager.laserTowerPrefab);
+					break;
+				case Towers.CannonTower:
+					previewTower = makePreview (gManager.cannonTowerPrefab);
+					break;
+				case Towers.FireTower:
+					previewTower = makePreview (gManager.fireTowerPrefab);
+					break;
 				case Towers.Generator:
 					previewTower = makePreview (gManager.generatorPrefab);
 					break;
@@ -57,6 +66,16 @@ public class UIManager : MonoBehaviour {
 	
 	public void TowerButtonClicked(){
 		previewState = Towers.Tower;
+	}
+	
+	public void LaserTowerButtonClicked(){
+		previewState = Towers.LaserTower;
+	}
+	public void CannonTowerButtonClicked(){
+		previewState = Towers.CannonTower;
+	}
+	public void FireTowerButtonClicked(){
+		previewState = Towers.FireTower;
 	}
 
 	public void MinerButtonClicked(){
@@ -193,6 +212,9 @@ public enum Towers{
 	None,
 	Miner,
 	Tower,
+	LaserTower,
+	CannonTower,
+	FireTower,
 	Generator,
 	Redirector
 }

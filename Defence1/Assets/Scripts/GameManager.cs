@@ -25,6 +25,9 @@ public class GameManager : MonoBehaviour {
 	public GameObject orePrefab;
 	public Miner minerPrefab;
 	public Tower towerPrefab;
+	public LaserTower laserTowerPrefab;
+	public CannonTower cannonTowerPrefab;
+	public FireTower fireTowerPrefab;
 	public Generator generatorPrefab;
 	public PowerRedirector redirectorPrefab;
 	public EnergyPoint energyPointPrefab;
