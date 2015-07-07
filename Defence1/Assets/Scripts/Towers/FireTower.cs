@@ -5,7 +5,7 @@ using System.Collections;
 /// Fire tower, a range attacking tower.
 /// </summary>
 public class FireTower : Tower {
-	public ParticleSystem _particleSystem;
+	public ParticleSystem fireSystem;
 	
 	private bool _isFiring;
 	protected override bool isFiring {
@@ -14,11 +14,11 @@ public class FireTower : Tower {
 			if(_isFiring != value){
 				_isFiring = value;
 				if (value) {
-					if (!_particleSystem.isPlaying)
-						_particleSystem.Play();
+					if (!fireSystem.isPlaying) 
+						fireSystem.Play();
 				} else {
-					if (!_particleSystem.isStopped)
-						_particleSystem.Stop();
+					if (!fireSystem.isStopped)
+						fireSystem.Stop();
 				}
 			}
 		}
