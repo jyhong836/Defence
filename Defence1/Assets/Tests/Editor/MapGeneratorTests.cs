@@ -24,7 +24,7 @@ namespace AssemblyCSharpEditorvs
 					oreAdded += 1;
 					Assert.That (amount,Is.InRange (generator.minOreValue,generator.maxOreValue));
 				},
-				randomPosInScene:()=>Vector2.zero
+				randomPosInScene: a =>Vector2.zero
 			);
 
 			Assert.That (oreAdded,Is.EqualTo (generator.oreNum));

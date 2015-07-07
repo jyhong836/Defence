@@ -51,9 +51,10 @@ public class GameManager : MonoBehaviour {
 	}
 
 	void generateMap(){
-		var mapGen = new MapGenerator(oreNum: 50);
+		var mapGen = new MapGenerator(oreNum: 100);
 		var oreParent = Instantiate (emptyPrefab);
 		oreParent.name = "Ores";
+
 		mapGen.generateOres (
 			genFunc: (pos, ore) => {
 				var oreObject = Instantiate (orePrefab);
@@ -64,10 +65,17 @@ public class GameManager : MonoBehaviour {
 		);
 	}
 
-	public Vector2 randomPosInScene(){
-		var x = mapSize * (UnityEngine.Random.value - 0.5f);
-		var y = mapSize * (UnityEngine.Random.value - 0.5f);
-		return new Vector2 (x, y);
+	System.Random random = new System.Random (1234); //Use the same seed for debug sake.
+	public Vector2 randomPosInScene(float oreAmount){
+		var r = Ore.radiusOfAmount (oreAmount);
+		var x = mapSize * (float)(random.NextDouble () - 0.5);
+		var y = mapSize * (float)(random.NextDouble () - 0.5);
+
+		var colliders = Physics.OverlapSphere (Vector3Extension.fromVec2 (x, y),r);
+		if(colliders.Length>0){
+			return randomPosInScene (oreAmount);
+		}else
+			return new Vector2 (x, y);
 	}
 
 	public Vector2 randomPosAtBound(){
