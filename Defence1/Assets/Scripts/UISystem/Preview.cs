@@ -6,10 +6,10 @@ public class Preview : MonoBehaviour {
 	static Color validColor = Color.green;
 	static Color invalideColor = Color.red;
 
+
 	Renderer render;
 
-	// Use this for initialization
-	void Start () {
+	void Start() {
 		render = GetComponent <Renderer> ();
 	}
 	

@@ -14,5 +14,11 @@ public class PowerRedirector : TowerParent {
 	public void init(Vector2 pos){
 		initParent (pos);
 	}
+
+	public override bool isRedirector {
+		get {
+			return true;
+		}
+	}
 		
 }
