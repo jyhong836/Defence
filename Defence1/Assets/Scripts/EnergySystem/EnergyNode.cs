@@ -36,7 +36,7 @@ public class EnergyNode : MonoBehaviour {
 		foreach (var c in colliders) {
 			var node = c.gameObject.GetComponent <EnergyNode> ();
 			if (node != null && node != this) {
-				if (shouldConnectTo(node)) {
+				if (shouldConnectTo(node.isRedirector)) {
 					connectTo (node);
 					node.connectTo (this);
 				}
