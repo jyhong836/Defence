@@ -10,6 +10,15 @@ public enum TowerMode {
 public class Tower : TowerParent {
 	
 	[SerializeField] Enemy currentTarget;
+	protected bool isTargetOutOfRange {
+		get {
+			if (currentTarget==null)
+				return false;
+			Vector2 start = this.gameObject.getPos();
+			start -= currentTarget.gameObject.getPos();
+			return start.sqrMagnitude > attackingRadius;
+		}
+	}
 	public bool isAttacking = false;
 	
 	[SerializeField] protected float attackingRadius = 6;
@@ -141,8 +150,7 @@ public class Tower : TowerParent {
 	/// </summary>
 	/// <returns>Time interval.</returns>
 	protected virtual float AttackTarget () {
-		// FIXME When the target is out of range, the currentTarget is not updated yet.
-		if (currentTarget == null || currentTarget.lifeLeft <= 0) {
+		if (currentTarget == null || currentTarget.lifeLeft <= 0 || isTargetOutOfRange) {
 			ChangeCurrentTarget ();
 		} else if (aimControl.ready) {
 			currentTarget.lifeLeft -= injury;
