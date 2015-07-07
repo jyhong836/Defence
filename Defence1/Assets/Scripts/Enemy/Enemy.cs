@@ -94,7 +94,7 @@ public class Enemy : MonoBehaviour {
 		Vector3 end = currentTarget.transform.position;
 		Vector3 start = transform.position;
 		Vector3 dist = end - start;
-		if (dist.sqrMagnitude > attackingRadus) {
+		if (dist.magnitude > attackingRadus) {
 			return;
 		}
 		if (currentTarget.lifeLeft > 0)

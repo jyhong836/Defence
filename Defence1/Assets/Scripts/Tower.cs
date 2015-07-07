@@ -9,17 +9,19 @@ public enum TowerMode {
 
 public class Tower : TowerParent {
 	
-	[SerializeField] Enemy currentTarget;
+	[SerializeField] protected Enemy currentTarget;
 	protected bool isTargetOutOfRange {
 		get {
 			if (currentTarget==null)
-				return false;
+				return true;
 			Vector2 start = this.gameObject.getPos();
 			start -= currentTarget.gameObject.getPos();
-			return start.sqrMagnitude > attackingRadius;
+//			Debug.Log(start.sqrMagnitude+" " + attackingRadius);
+			return start.magnitude > attackingRadius;
 		}
 	}
-	public bool isAttacking = false;
+	protected bool isAttacking = false;
+	protected virtual bool isFiring{ get; set; }
 	
 	[SerializeField] protected float attackingRadius = 6;
 	[SerializeField] protected float idlePowerUsage = 0.001f; // per sec
@@ -113,6 +115,7 @@ public class Tower : TowerParent {
 
 	// Use this for initialization
 	void Start () {
+		isAttacking = true; // FIXME attack start at begining
 		ChangeCurrentTarget ();
 		nextAttackTime = attackInterval;
 	}
@@ -137,11 +140,13 @@ public class Tower : TowerParent {
 		}
 	}
 
+	// control the attack time
 	protected void Attack () {
 		if (nextAttackTime <= 0) {
 			nextAttackTime += AttackTarget();
 		} else {
 			nextAttackTime -= Time.fixedDeltaTime;
+			isFiring = false;
 		}
 	}
 
@@ -154,9 +159,11 @@ public class Tower : TowerParent {
 			ChangeCurrentTarget ();
 		} else if (aimControl.ready) {
 			currentTarget.lifeLeft -= injury;
+			isFiring = true;
 			return attackInterval;
 		} else 
 			aimControl.updateOrientation (Time.fixedDeltaTime);
+		isFiring = false;
 		return 0;
 	}
 
@@ -164,19 +171,19 @@ public class Tower : TowerParent {
 	/// Changes the current target to a new enemy.
 	/// </summary>
 	/// <returns>Time for rotate to new target or 0.</returns>
-	protected bool ChangeCurrentTarget () {
+	protected virtual bool ChangeCurrentTarget () {
 		var colliders = Physics.OverlapSphere (transform.position,attackingRadius,Masks.Enemy);
 		if (colliders.Length > 0) {
 			//random pick one
 			var index = UnityEngine.Random.Range (0, colliders.Length);
 			var enemy = colliders [index].gameObject.GetComponent <Enemy>();
 			currentTarget = enemy;
-			isAttacking = true;
+//			isAttacking = true;
 
 			return true;
 		} else {
 			currentTarget = null;
-			isAttacking = false;
+//			isAttacking = false;
 			return false;
 		}
 	}
