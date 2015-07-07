@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
+using System.Linq;
 
 public class EffectManager : MonoBehaviour {
 	public static Color connectionColor = new Color (0.3f, 0.3f, 1f);
@@ -16,7 +17,7 @@ public class EffectManager : MonoBehaviour {
 	}
 
 	void Update(){
-			handleMousePoint ();
+		handleMousePoint ();
 	}
 
 	GameObject lastPointOver;
@@ -27,13 +28,17 @@ public class EffectManager : MonoBehaviour {
 		RaycastHit hitInfo;
 		if(Physics.Raycast (ray, out hitInfo)){
 			var obj = hitInfo.collider.gameObject;
-			if (obj != lastPointOver) {
+			if (obj != lastPointOver || obj.tag == "Preview") { //Previews need to be refresh every frame.
 				clearPointOverObject ();
 
 				var tower = obj.GetComponent <TowerParent> ();
-				if (tower != null) {
+				if (tower != null && tower.alive) {
 					mouseOverTower (tower);
 				}
+
+				var rangePreview = obj.transform.GetComponentInChildren <RangePreview> ();
+				if (rangePreview != null)
+					drawPreivewConnections (rangePreview);
 
 				lastPointOver = obj;
 			}
@@ -50,18 +55,28 @@ public class EffectManager : MonoBehaviour {
 			pointOverEffectObject.name = "Effects";
 		}
 	}
-
-	void mouseOverTower(TowerParent tower){
-		var node = tower.energyNode;
-		var startPos = node.transform.position;
-		foreach (var n in node.targetNodes) {
-			var endPos = n.transform.position;
-			makeLine (connectionLinePrefab, startPos, endPos, connectionColor, connectionColor,
+		
+	void drawConnections(Vector3 start, IEnumerable<Vector3> ends){
+		foreach(var p in ends){
+			makeLine (connectionLinePrefab, start, p, connectionColor, connectionColor,
 				connectionWidth, 0, pointOverEffectObject, "Connection");
 		}
 	}
 
-	LineRenderer makeLine(LineRenderer prefab ,Vector3 start, Vector3 end, Color colorStart, Color colorEnd,
+	void mouseOverTower(TowerParent tower){
+		var node = tower.energyNode;
+		var start = node.transform.position;
+		var ends = node.targetNodes.Select (n => n.transform.position);
+		drawConnections (start,ends);
+	}
+
+	void drawPreivewConnections(RangePreview preview){
+		var start = preview.transform.position;
+		var ends = preview.connections.Select (n => n.transform.position);
+		drawConnections (start,ends);
+	}
+
+	public static LineRenderer makeLine(LineRenderer prefab ,Vector3 start, Vector3 end, Color colorStart, Color colorEnd,
 		float widthStart, float widthEnd, GameObject parent, string lineName){
 
 		var render = Instantiate (prefab);

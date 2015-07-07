@@ -8,6 +8,7 @@ public class UIManager : MonoBehaviour {
 	public GameManager gManager;
 	public Text oreText;
 	public Text warningText;
+	public RangePreview rangePreviewPrefab;
 
 	[SerializeField] Towers _placementState = Towers.None;
 	[SerializeField] float fadeOutTime = 2;
@@ -74,9 +75,14 @@ public class UIManager : MonoBehaviour {
 		var obj = Instantiate (prefab.gameObject);
 		destroyOptionally (obj.GetComponent<T> ());
 		obj.name = "Preview Model";
+		obj.tag = "Preview";
 
 		var r = obj.AddComponent <Rigidbody>();
 		r.isKinematic = true;
+
+		var rangePreview = Instantiate (rangePreviewPrefab);
+		rangePreview.init (obj.transform,EnergyNode.transmissionRadius);
+
 		var preview = obj.AddComponent <Preview>();
 
 		return preview;
