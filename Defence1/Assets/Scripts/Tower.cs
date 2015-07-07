@@ -9,15 +9,21 @@ public enum TowerMode {
 
 public class Tower : TowerParent {
 	
-	public float attackingRadius = 6;
-	
 	[SerializeField] Enemy currentTarget;
 	public bool isAttacking = false;
-	public float idlePowerUsage = 0.001f; // per sec
-	public float attackPowerUsage = 0.01f; // per sec
-	public float injury = 10;
-	public float attackInterval = 2;
+	
+	[SerializeField] protected float attackingRadius = 6;
+	[SerializeField] protected float idlePowerUsage = 0.001f; // per sec
+	[SerializeField] protected float attackPowerUsage = 0.01f; // per sec
+	[SerializeField] protected float injury = 10;
+	[SerializeField] protected float attackInterval = 2;
+	[SerializeField] protected float rotateSpeed = 1;
+	[SerializeField] protected float fireAngle = 0.01f;
+
 	private float nextAttackTime;
+	
+	AimingControl aimControl;
+	public Transform rotationPart;
 
 	// mode
 	[SerializeField] TowerMode mode = TowerMode.Attack;
@@ -36,7 +42,7 @@ public class Tower : TowerParent {
 	}
 
 	// power
-	private bool isOutOfPower = false; // TODO true;
+	[SerializeField] bool isOutOfPower = true;
 	[SerializeField] float power = 0;
 	public override float powerLeft {
 		get { return power; }
@@ -68,8 +74,15 @@ public class Tower : TowerParent {
 	
 	public void init(Vector2 pos){
 		initParent (pos);
-
-		transform.position = Vector3Extension.fromVec2 (pos);
+		
+		aimControl = 
+			new HorizontalRotationAimingControl (
+				rotateSpeed: () => rotateSpeed,
+				fireAngle: () => fireAngle,
+				rotateToDirection: RotationMath.RotatePart (rotationPart, 0f),
+				hasTarget: () => currentTarget!=null,
+				targetDirection: () => RotationMath.directionOf (currentTarget.getPos () - this.getPos ())
+				);
 	}
 
 	void FixedUpdate () {
@@ -78,8 +91,8 @@ public class Tower : TowerParent {
 				isAttacking = false;
 			} else {
 				powerLeft -= attackPowerUsage*Time.fixedDeltaTime;
+				Attack();
 			}
-			Attack();
 		} else if (!isOutOfPower) {
 			if (powerLeft < idlePowerUsage) {
 				isOutOfPower = true;
@@ -100,8 +113,10 @@ public class Tower : TowerParent {
 		if (isAttacking && currentTarget != null) {
 			var start = transform.position;
 			var end = currentTarget.transform.position;
-
-			Debug.DrawLine (start,end,Color.red);
+			if (aimControl.ready)
+				Debug.DrawLine (start,end,Color.red);
+			else
+				Debug.DrawLine (start,end,Color.green);
 		}
 	}
 
@@ -113,27 +128,35 @@ public class Tower : TowerParent {
 		}
 	}
 
-	void Attack () {
-		if (currentTarget == null) {
-			ChangeCurrentTarget ();
-			return;
-		}
-		if (currentTarget.lifeLeft > 0)
-			AttackTarget ();
-		else
-			ChangeCurrentTarget ();
-	}
-
-	void AttackTarget () {
+	protected void Attack () {
 		if (nextAttackTime <= 0) {
-			currentTarget.lifeLeft -= injury;
-			nextAttackTime += attackInterval;
+			nextAttackTime += AttackTarget();
 		} else {
 			nextAttackTime -= Time.fixedDeltaTime;
 		}
 	}
-	
-	void ChangeCurrentTarget () {
+
+	/// <summary>
+	/// Attacks the target.
+	/// </summary>
+	/// <returns>Time interval.</returns>
+	protected virtual float AttackTarget () {
+		// FIXME When the target is out of range, the currentTarget is not updated yet.
+		if (currentTarget == null || currentTarget.lifeLeft <= 0) {
+			ChangeCurrentTarget ();
+		} else if (aimControl.ready) {
+			currentTarget.lifeLeft -= injury;
+			return attackInterval;
+		} else 
+			aimControl.updateOrientation (Time.fixedDeltaTime);
+		return 0;
+	}
+
+	/// <summary>
+	/// Changes the current target to a new enemy.
+	/// </summary>
+	/// <returns>Time for rotate to new target or 0.</returns>
+	protected bool ChangeCurrentTarget () {
 		var colliders = Physics.OverlapSphere (transform.position,attackingRadius,Masks.Enemy);
 		if (colliders.Length > 0) {
 			//random pick one
@@ -141,9 +164,12 @@ public class Tower : TowerParent {
 			var enemy = colliders [index].gameObject.GetComponent <Enemy>();
 			currentTarget = enemy;
 			isAttacking = true;
+
+			return true;
 		} else {
 			currentTarget = null;
 			isAttacking = false;
+			return false;
 		}
 	}
 
