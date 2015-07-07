@@ -10,10 +10,28 @@ public class Miner : TowerParent {
 	public static readonly float workingRadius = 6;
 	public static readonly float energyConsumingSpeed = 10;
 
+	public LaserEffect miningLaser;
 	public Transform rotationPart;
-	[SerializeField] Ore currentTarget;
 	[SerializeField] bool finishedWorking = false;
 	[SerializeField] bool hasEnoughEnergy = false;
+
+	bool _isFiring;
+	public bool isFiring {
+		get {return isFiring;} 
+		private set {
+			if(_isFiring != value){
+				_isFiring = value;
+				miningLaser.showEffect = value;
+				if(value){
+					miningLaser.setEndpoints (firePoint, currentTarget.transform.position);
+				}
+			}
+		}
+	}
+	public Ore currentTarget { get; private set;}
+	public Vector3 firePoint{
+		get{return transform.position;}
+	}
 
 	float oreTemp;
 	Action<int> collectCallback;
@@ -59,26 +77,33 @@ public class Miner : TowerParent {
 
 	void collectFromTarget(){
 		aimControl.updateOrientation (Time.fixedDeltaTime);
-
-		var de = energyConsumingSpeed * Time.fixedDeltaTime;
-		hasEnoughEnergy = powerLeft > de;
-
-		if (aimControl.ready && hasEnoughEnergy) {
-			powerLeft -= de;
+		if (aimControl.ready) {
+			var de = energyConsumingSpeed * Time.fixedDeltaTime;
+			hasEnoughEnergy = powerLeft > de;
+			if (hasEnoughEnergy) {
+				powerLeft -= de;
+				isFiring = true;
 			
-			var amount = Mathf.Min (currentTarget.oreLeft, oreCollectSpeed * Time.fixedDeltaTime);
-			currentTarget.oreLeft -= (amount + 1e-5f);
-			oreTemp += amount;
+				var amount = Mathf.Min (currentTarget.oreLeft, oreCollectSpeed * Time.fixedDeltaTime);
+				currentTarget.oreLeft -= (amount + 1e-5f);
+				oreTemp += amount;
 
-			if (oreTemp >= oreCollectSpeed * oreUpdateInterval) {
-				var send = (int)oreTemp;
-				collectCallback (send);
-				oreTemp -= send;
+				if (oreTemp >= oreCollectSpeed * oreUpdateInterval) {
+					var send = (int)oreTemp;
+					collectCallback (send);
+					oreTemp -= send;
+				}
+			}else{
+				isFiring = false;
 			}
+		}else{
+			isFiring = false;
 		}
 	}
 
 	void changeCurrentTarget(){
+		isFiring = false;
+
 		var colliders = Physics.OverlapSphere (transform.position,workingRadius,Masks.Ore);
 		if(colliders.Length > 0){
 			//random pick one

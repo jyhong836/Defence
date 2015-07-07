@@ -9,6 +9,7 @@ public class EnergyNode : MonoBehaviour {
 	static readonly Color connectionColor = new Color(0.3f,0.3f,1.0f);
 
 	public TowerParent tower;
+	public bool isRedirector {get{ return tower.isRedirector;}} 
 
 	public List<EnergyNode> targetNodes = new List<EnergyNode>();
 	Func<float,float> energyArrived;
@@ -31,14 +32,20 @@ public class EnergyNode : MonoBehaviour {
 		
 
 	void setupConnections() {
-		var colliders = Physics.OverlapSphere (transform.position, transmissionRadius, Masks.EnergySystem);
-		foreach(var c in colliders){
-			if (c.gameObject != gameObject) {
-				var node = c.gameObject.GetComponent <EnergyNode> ();
-				connectTo (node);
-				node.connectTo (this);
+		var colliders = Physics.OverlapSphere (transform.position, transmissionRadius);
+		foreach (var c in colliders) {
+			var node = c.gameObject.GetComponent <EnergyNode> ();
+			if (node != null && node != this) {
+				if (shouldConnectTo(node)) {
+					connectTo (node);
+					node.connectTo (this);
+				}
 			}
 		}
+	}
+
+	public bool shouldConnectTo(bool targetIsRedirector){
+		return isRedirector || targetIsRedirector;
 	}
 
 	public void clearAllConnections() {

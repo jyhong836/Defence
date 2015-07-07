@@ -9,7 +9,7 @@ public abstract class TowerParent : MonoBehaviour {
 	public EnergyNode energyNode { get; private set;} //The embeded enrgyNode for every building.
 
 	public virtual float powerLeft { get; set;}
-
+	public virtual bool isRedirector{ get{ return false; }}
 	public abstract float maxPower ();
 
 	public void destroySelf (GameManager manager){

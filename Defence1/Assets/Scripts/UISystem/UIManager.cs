@@ -73,7 +73,8 @@ public class UIManager : MonoBehaviour {
 		
 	Preview makePreview<T> (T prefab) where T: TowerParent{
 		var obj = Instantiate (prefab.gameObject);
-		destroyOptionally (obj.GetComponent<T> ());
+		var tower = obj.GetComponent<T> ();
+		destroyOptionally (tower);
 		obj.name = "Preview Model";
 		obj.tag = "Preview";
 
@@ -81,7 +82,7 @@ public class UIManager : MonoBehaviour {
 		r.isKinematic = true;
 
 		var rangePreview = Instantiate (rangePreviewPrefab);
-		rangePreview.init (obj.transform,EnergyNode.transmissionRadius);
+		rangePreview.init (obj.transform,EnergyNode.transmissionRadius,tower.isRedirector);
 
 		var preview = obj.AddComponent <Preview>();
 
