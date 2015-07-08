@@ -21,7 +21,18 @@ public class Tower : TowerParent {
 		}
 	}
 	protected bool isAttacking = false;
-	protected virtual bool isFiring{ get; set; }
+	
+	protected bool _isFiring;
+	protected virtual bool isFiring{ get{
+			return _isFiring;
+		} 
+		set{
+			_isFiring = value;
+			if (value) {
+				currentTarget.lifeLeft -= injury;
+			}
+		} 
+	}
 	
 	[SerializeField] protected float attackingRadius = 6;
 	[SerializeField] protected float idlePowerUsage = 0.001f; // per sec
@@ -33,7 +44,7 @@ public class Tower : TowerParent {
 
 	private float nextAttackTime;
 	
-	AimingControl aimControl;
+	protected AimingControl aimControl;
 	public Transform rotationPart;
 
 	// mode
@@ -158,7 +169,6 @@ public class Tower : TowerParent {
 		if (currentTarget == null || currentTarget.lifeLeft <= 0 || isTargetOutOfRange) {
 			ChangeCurrentTarget ();
 		} else if (aimControl.ready) {
-			currentTarget.lifeLeft -= injury;
 			isFiring = true;
 			return attackInterval;
 		} else 
