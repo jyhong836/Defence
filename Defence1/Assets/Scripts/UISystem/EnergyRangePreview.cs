@@ -9,8 +9,8 @@ public class EnergyRangePreview : RangePreviewParent {
 		get { return 0f; }
 	}
 
-	public void init(Vector2 pos,float radius, bool isRedirector, bool showRange){
-		init (Vector3Extension.fromVec2 (pos),radius);
+	public void init(Transform parent,float radius, bool isRedirector, bool showRange){
+		init (parent,radius);
 		this.isRedirector = isRedirector;
 		var mesh = GetComponent <MeshRenderer>();
 		mesh.enabled = showRange;

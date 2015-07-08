@@ -8,6 +8,9 @@ public class UIManager : MonoBehaviour {
 	public GameManager gManager;
 	public Text oreText;
 	public Text warningText;
+	public EnergyRangePreview energyRangePrefab;
+	public AttackingRangePreview attackRangePrefab;
+	public MiningRangePreview miningRangePrefab;
 
 	[SerializeField] Towers _placementState = Towers.None;
 	[SerializeField] float fadeOutTime = 2;
@@ -21,11 +24,33 @@ public class UIManager : MonoBehaviour {
 				_placementState = value;
 				if (previewTower != null) 
 					Destroy (previewTower.gameObject);
-				if (value == Towers.None)
+				switch(value){
+				case Towers.None:
 					previewTower = null;
-				else{
-					var prefab = gManager.getPrefabOfType (value);
-					previewTower = Preview.makePreview (prefab);
+					break;
+				case Towers.Miner:
+					previewTower = makeMinerPreview (gManager.minerPrefab);
+					break;
+				case Towers.Tower: //TODO This should be removed in the future.
+					previewTower = makeWeaponPreview (gManager.towerPrefab);
+					break;
+				case Towers.LaserTower:
+					previewTower = makeWeaponPreview (gManager.laserTowerPrefab);
+					break;
+				case Towers.CannonTower:
+					previewTower = makeWeaponPreview (gManager.cannonTowerPrefab);
+					break;
+				case Towers.FireTower:
+					previewTower = makeWeaponPreview (gManager.fireTowerPrefab);
+					break;
+				case Towers.Generator:
+					previewTower = makePreview (gManager.generatorPrefab);
+					break;
+				case Towers.Redirector:
+					previewTower = makePreview (gManager.redirectorPrefab);
+					break;
+				default:
+					throw new UnityException ("Unknow Preview State.");
 				}
 			}
 		}
@@ -65,6 +90,44 @@ public class UIManager : MonoBehaviour {
 
 	public void RedirectorButtonClicked(){
 		previewState = Towers.Redirector;
+	}
+		
+	Preview makePreview<T> (T prefab) where T: Tower{
+		var obj = Instantiate (prefab.gameObject);
+		var tower = obj.GetComponent<T> ();
+		destroyOptionally (tower);
+		obj.name = "Preview Model";
+		obj.tag = "Preview";
+
+		var r = obj.AddComponent <Rigidbody> ();
+		r.isKinematic = true;
+
+		var preview = obj.AddComponent <Preview> ();
+
+		var showRange = prefab is Generator || prefab is PowerRedirector;
+		var energyRange = Instantiate (energyRangePrefab);
+		energyRange.init (obj.transform, EnergyNode.transmissionRadius, tower.isRedirector, showRange);
+		preview.addRange (energyRange);
+
+		return preview;
+	}
+
+	Preview makeWeaponPreview<U> (U prefab) where U: WeaponTower{
+		var preview = makePreview (prefab);
+
+		var attackRange = Instantiate (attackRangePrefab);
+		attackRange.init (preview.transform, prefab.attackingRadius);
+		preview.addRange (attackRange);
+		return preview;
+	}
+
+	Preview makeMinerPreview (Miner prefab){
+		var preview = makePreview (prefab);
+
+		var miningRange = Instantiate (miningRangePrefab);
+		miningRange.init (preview.transform, Miner.workingRadius);
+		preview.addRange (miningRange);
+		return preview;
 	}
 
 	public static void destroyOptionally(UnityEngine.Object b){
