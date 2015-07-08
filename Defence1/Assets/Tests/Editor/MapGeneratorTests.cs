@@ -16,16 +16,19 @@ namespace AssemblyCSharpEditorvs
 		public void OreGenerationTest(int oreToMake){
 			Assume.That (oreToMake>=0 && oreToMake < 5000);
 
-			var generator = new MapGenerator (oreToMake);
-
 			var oreAdded = 0;
-			generator.generateOres (
-				genFunc: (pos,amount)=>{
+			var minOre = 50;
+			var maxOre = 1000;
+
+			var generator = new MapGenerator (oreToMake, mapSize: 1,
+				putOre: (pos, amount) => {
 					oreAdded += 1;
-					Assert.That (amount,Is.InRange (generator.minOreValue,generator.maxOreValue));
+					Assert.That (amount,Is.InRange (minOre,maxOre));
 				},
-				randomPosInScene: a =>Vector2.zero
+				checkAvailable: (pos, amount) => true,
+				minOreValue: minOre, maxOreValue: maxOre
 			);
+				
 
 			Assert.That (oreAdded,Is.EqualTo (generator.oreNum));
 		}

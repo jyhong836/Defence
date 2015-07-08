@@ -34,12 +34,12 @@ public class Tower : TowerParent {
 		} 
 	}
 	
-	[SerializeField] protected float attackingRadius = 6;
+	[SerializeField] protected float attackingRadius = 8;
 	[SerializeField] protected float idlePowerUsage = 0.001f; // per sec
 	[SerializeField] protected float attackPowerUsage = 0.01f; // per sec
-	[SerializeField] protected float injury = 10;
+	[SerializeField] protected float injury = 30;
 	[SerializeField] protected float attackInterval = 2;
-	[SerializeField] protected float rotateSpeed = 1;
+	[SerializeField] protected float rotateSpeed = 3;
 	[SerializeField] protected float fireAngle = 0.01f;
 
 	private float nextAttackTime;
@@ -201,7 +201,7 @@ public class Tower : TowerParent {
 	#region implemented abstract members of TowerParent
 	public override float maxPower ()
 	{
-		return 50;
+		return 60;
 	}
 	#endregion
 }
