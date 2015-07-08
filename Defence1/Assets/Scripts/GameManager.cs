@@ -125,47 +125,45 @@ public class GameManager : MonoBehaviour {
 		return r;
 	}
 
-	public Tower createTowerOfType(Vector2 pos, Towers towerType){
+	public Tower createTowerOfType(Vector2 pos, TowerType towerType){
 		switch (towerType) {
-		case Towers.Redirector:
+		case TowerType.Redirector:
 			return createPowerRedirector (pos);
-		case Towers.Miner:
+		case TowerType.Miner:
 			return createMiner (pos);
-		case Towers.Tower:
-			return createTower (pos);
-		case Towers.LaserTower:
+		case TowerType.LaserTower:
 			return createLaserTower (pos);
-		case Towers.CannonTower:
+		case TowerType.CannonTower:
 			return createCannonTower (pos);
-		case Towers.FireTower:
+		case TowerType.FireTower:
 			return createFireTower (pos);
-		case Towers.Generator:
+		case TowerType.Generator:
 			return createGenerator (pos);
 		default:
 			throw new UnityException ("Don't know what to create!");
 		}
 	}
 
-	public Tower getPrefabOfType(Towers t){
+	public Tower getPrefabOfType(TowerType t){
 		switch(t){
-		case Towers.Miner:
+		case TowerType.Miner:
 			return minerPrefab;
-		case Towers.LaserTower:
+		case TowerType.LaserTower:
 			return laserTowerPrefab;
-		case Towers.CannonTower:
+		case TowerType.CannonTower:
 			return cannonTowerPrefab;
-		case Towers.FireTower:
+		case TowerType.FireTower:
 			return fireTowerPrefab;
-		case Towers.Generator:
+		case TowerType.Generator:
 			return generatorPrefab;
-		case Towers.Redirector:
+		case TowerType.Redirector:
 			return redirectorPrefab;
 		default:
 			throw new UnityException ("Can't find prefab of this type!");
 		}
 	}
 
-	public ConstructingTower createConstructingTower(Vector2 pos, Towers towerType, GameObject model){
+	public ConstructingTower createConstructingTower(Vector2 pos, TowerType towerType, GameObject model){
 		model.transform.parent = towerParent.transform;
 		var t = model.AddComponent<ConstructingTower> ();
 		t.init (pos, ConstructingTower.powerNeedToConstruct (towerType),

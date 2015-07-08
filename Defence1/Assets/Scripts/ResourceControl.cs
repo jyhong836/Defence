@@ -37,27 +37,23 @@ public class ResourceControl{
 		}
 	}
 
-	public bool tryCostOre(Towers t){
+	public bool tryCostOre(TowerType t){
 		return tryChangeOre ( -priceOf (t));
 	}
 
-	public int priceOf(Towers t){
+	public int priceOf(TowerType t){
 		switch(t){
-		case Towers.None:
-			return 0;
-		case Towers.Miner:
+		case TowerType.Miner:
 			return 50;
-		case Towers.Tower:
+		case TowerType.LaserTower:
 			return 50;
-		case Towers.LaserTower:
+		case TowerType.CannonTower:
 			return 50;
-		case Towers.CannonTower:
+		case TowerType.FireTower:
 			return 50;
-		case Towers.FireTower:
-			return 50;
-		case Towers.Generator:
+		case TowerType.Generator:
 			return 100;
-		case Towers.Redirector:
+		case TowerType.Redirector:
 			return 10;
 
 		default:

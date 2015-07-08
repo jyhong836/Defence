@@ -12,41 +12,43 @@ public class UIManager : MonoBehaviour {
 	public AttackingRangePreview attackRangePrefab;
 	public MiningRangePreview miningRangePrefab;
 
-	[SerializeField] Towers _placementState = Towers.None;
 	[SerializeField] float fadeOutTime = 2;
 
 	Preview previewTower;
-
-	public Towers previewState{
+	bool _inPreviewModel = false;
+	public bool inPreviewModel {
+		get {return _inPreviewModel;}
+		set {
+			if(value != _inPreviewModel){
+				_inPreviewModel = value;
+				if(!value)
+					Destroy (previewTower.gameObject);
+			}
+		}
+	}
+	[SerializeField] TowerType _placementState;
+	public TowerType previewState{
 		get{ return _placementState;}
 		set{
 			if(value != _placementState){
 				_placementState = value;
-				if (previewTower != null) 
-					Destroy (previewTower.gameObject);
 				switch(value){
-				case Towers.None:
-					previewTower = null;
-					break;
-				case Towers.Miner:
+				case TowerType.Miner:
 					previewTower = makeMinerPreview (gManager.minerPrefab);
 					break;
-				case Towers.Tower: //TODO This should be removed in the future.
-					previewTower = makeWeaponPreview (gManager.towerPrefab);
-					break;
-				case Towers.LaserTower:
+				case TowerType.LaserTower:
 					previewTower = makeWeaponPreview (gManager.laserTowerPrefab);
 					break;
-				case Towers.CannonTower:
+				case TowerType.CannonTower:
 					previewTower = makeWeaponPreview (gManager.cannonTowerPrefab);
 					break;
-				case Towers.FireTower:
+				case TowerType.FireTower:
 					previewTower = makeWeaponPreview (gManager.fireTowerPrefab);
 					break;
-				case Towers.Generator:
+				case TowerType.Generator:
 					previewTower = makePreview (gManager.generatorPrefab);
 					break;
-				case Towers.Redirector:
+				case TowerType.Redirector:
 					previewTower = makePreview (gManager.redirectorPrefab);
 					break;
 				default:
@@ -65,31 +67,28 @@ public class UIManager : MonoBehaviour {
 		handleCancelation ();
 		handleTowerPlacement ();
 	}
-	
-	public void TowerButtonClicked(){
-		Debug.Log ("Tower is deprecated now. Please use its children.");
-	}
-	
-	public void LaserTowerButtonClicked(){
-		previewState = Towers.LaserTower;
-	}
-	public void CannonTowerButtonClicked(){
-		previewState = Towers.CannonTower;
-	}
-	public void FireTowerButtonClicked(){
-		previewState = Towers.FireTower;
+
+	public TowerType towerTypeOfName(string name){
+		if (name == "Redirector")
+			return TowerType.Redirector;
+		else if (name == "Generator")
+			return TowerType.Generator;
+		else if (name == "Miner")
+			return TowerType.Miner;
+		else if (name == "FireTower")
+			return TowerType.FireTower;
+		else if (name == "CannonTower")
+			return TowerType.CannonTower;
+		else if (name == "LaserTower")
+			return TowerType.LaserTower;
+
+		throw new ArgumentException ("No such name exists!");
 	}
 
-	public void MinerButtonClicked(){
-		previewState = Towers.Miner;
-	}
-
-	public void GeneratorButtonClicked(){
-		previewState = Towers.Generator;
-	}
-
-	public void RedirectorButtonClicked(){
-		previewState = Towers.Redirector;
+	public void towerButtonClicked(string name){
+		inPreviewModel = false;
+		inPreviewModel = true;
+		previewState = towerTypeOfName (name);
 	}
 		
 	Preview makePreview<T> (T prefab) where T: Tower{
@@ -137,7 +136,7 @@ public class UIManager : MonoBehaviour {
 	}
 
 	void handleMousePoint(){
-		if (previewTower != null) {
+		if (inPreviewModel) {
 			var ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 			var plane = new Plane (Vector3.up, 0f);
 
@@ -151,7 +150,7 @@ public class UIManager : MonoBehaviour {
 
 	void handleCancelation(){
 		if(Input.GetButtonDown ("Cancel")){
-			previewState = Towers.None;
+			inPreviewModel = false;
 		}
 	}
 
@@ -211,10 +210,8 @@ public class UIManager : MonoBehaviour {
 }
 
 
-public enum Towers{
-	None,
+public enum TowerType{
 	Miner,
-	Tower, //TODO remove this
 	LaserTower,
 	CannonTower,
 	FireTower,

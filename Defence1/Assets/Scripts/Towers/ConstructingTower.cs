@@ -52,19 +52,19 @@ public class ConstructingTower : Tower {
 		}
 	}
 
-	public static float powerNeedToConstruct(Towers t){
+	public static float powerNeedToConstruct(TowerType t){
 		switch(t){
-		case Towers.Redirector:
+		case TowerType.Redirector:
 			return 10;
-		case Towers.Generator:
+		case TowerType.Generator:
 			return 400;
-		case Towers.Miner:
+		case TowerType.Miner:
 			return 250;
-		case Towers.LaserTower:
+		case TowerType.LaserTower:
 			return 300;
-		case Towers.FireTower:
+		case TowerType.FireTower:
 			return 300;
-		case Towers.CannonTower:
+		case TowerType.CannonTower:
 			return 500;
 		default:
 			throw new  NotImplementedException ();
