@@ -8,7 +8,9 @@ public class UIManager : MonoBehaviour {
 	public GameManager gManager;
 	public Text oreText;
 	public Text warningText;
-	public RangePreview rangePreviewPrefab;
+	public EnergyRangePreview energyRangePrefab;
+	public AttackingRangePreview attackRangePrefab;
+	public MiningRangePreview miningRangePrefab;
 
 	[SerializeField] Towers _placementState = Towers.None;
 	[SerializeField] float fadeOutTime = 2;
@@ -27,19 +29,19 @@ public class UIManager : MonoBehaviour {
 					previewTower = null;
 					break;
 				case Towers.Miner:
-					previewTower = makePreview (gManager.minerPrefab);
+					previewTower = makeMinerPreview (gManager.minerPrefab);
 					break;
-				case Towers.Tower:
-					previewTower = makePreview (gManager.towerPrefab);
+				case Towers.Tower: //TODO This should be removed in the future.
+					previewTower = makeWeaponPreview (gManager.towerPrefab);
 					break;
 				case Towers.LaserTower:
-					previewTower = makePreview (gManager.laserTowerPrefab);
+					previewTower = makeWeaponPreview (gManager.laserTowerPrefab);
 					break;
 				case Towers.CannonTower:
-					previewTower = makePreview (gManager.cannonTowerPrefab);
+					previewTower = makeWeaponPreview (gManager.cannonTowerPrefab);
 					break;
 				case Towers.FireTower:
-					previewTower = makePreview (gManager.fireTowerPrefab);
+					previewTower = makeWeaponPreview (gManager.fireTowerPrefab);
 					break;
 				case Towers.Generator:
 					previewTower = makePreview (gManager.generatorPrefab);
@@ -97,13 +99,31 @@ public class UIManager : MonoBehaviour {
 		obj.name = "Preview Model";
 		obj.tag = "Preview";
 
-		var r = obj.AddComponent <Rigidbody>();
+		var r = obj.AddComponent <Rigidbody> ();
 		r.isKinematic = true;
 
-		var rangePreview = Instantiate (rangePreviewPrefab);
-		rangePreview.init (obj.transform,EnergyNode.transmissionRadius,tower.isRedirector);
+		var showRange = prefab is Generator || prefab is PowerRedirector;
+		var energyRange = Instantiate (energyRangePrefab);
+		energyRange.init (obj.transform, EnergyNode.transmissionRadius, tower.isRedirector, showRange);
 
-		var preview = obj.AddComponent <Preview>();
+
+		var preview = obj.AddComponent <Preview> ();
+		return preview;
+	}
+
+	Preview makeWeaponPreview<U> (U prefab) where U: WeaponTower{
+		var preview = makePreview (prefab);
+
+		var attackRange = Instantiate (attackRangePrefab);
+		attackRange.init (preview.transform, prefab.attackingRadius);
+		return preview;
+	}
+
+	Preview makeMinerPreview (Miner prefab){
+		var preview = makePreview (prefab);
+
+		var miningRange = Instantiate (miningRangePrefab);
+		miningRange.init (preview.transform, Miner.workingRadius);
 
 		return preview;
 	}
@@ -221,7 +241,7 @@ public class UIManager : MonoBehaviour {
 public enum Towers{
 	None,
 	Miner,
-	Tower,
+	Tower, //TODO remove this
 	LaserTower,
 	CannonTower,
 	FireTower,

@@ -2,18 +2,19 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class RangePreview : MonoBehaviour {
-	public float radius;
+public class EnergyRangePreview : RangePreviewParent {
 	public List<EnergyNode> connections = new List<EnergyNode>();
 	public bool isRedirector;
 
-	public void init(Transform parent,float radius, bool isRedirector){
+	public override float upOffset {
+		get { return 0f; }
+	}
+
+	public void init(Transform parent,float radius, bool isRedirector, bool showRange){
+		init (parent,radius);
 		this.isRedirector = isRedirector;
-		this.radius = radius;
-		var scale = 2 * radius;
-		transform.localScale = new Vector3(scale,0.2f,scale);
-		transform.position = parent.position;
-		transform.parent = parent;
+		var mesh = GetComponent <MeshRenderer>();
+		mesh.enabled = showRange;
 	}
 
 	void Update() {

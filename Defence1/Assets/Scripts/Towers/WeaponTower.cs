@@ -8,6 +8,8 @@ public enum TowerMode {
 }
 
 public class WeaponTower : Tower {
+
+	public float attackingRadius = 8;
 	
 	[SerializeField] protected Enemy currentTarget;
 	protected bool isTargetOutOfRange {
@@ -33,8 +35,7 @@ public class WeaponTower : Tower {
 			}
 		} 
 	}
-	
-	[SerializeField] protected float attackingRadius = 8;
+
 	[SerializeField] protected float idlePowerUsage = 0.001f; // per sec
 	[SerializeField] protected float attackPowerUsage = 0.01f; // per sec
 	[SerializeField] protected float injury = 30;

@@ -5,10 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 
 public class EffectManager : MonoBehaviour {
-	public static Color connectionColor = new Color (0.3f, 0.3f, 1f);
+	public static Color energyConnectionColor = new Color (0.3f, 0.3f, 1f);
+	public static Color miningConnectionColor = Color.yellow;
 	public static float connectionWidth = 0.35f;
 
-	public LineRenderer connectionLinePrefab;
+	public LineRenderer energyconnectionPrefab;
+	public LineRenderer miningConnectionPrefab;
 	public GameObject emptyPrefab;
 
 	void Start(){
@@ -36,9 +38,13 @@ public class EffectManager : MonoBehaviour {
 					mouseOverTower (tower);
 				}
 
-				var rangePreview = obj.transform.GetComponentInChildren <RangePreview> ();
-				if (rangePreview != null)
-					drawPreivewConnections (rangePreview);
+				var energyRangePreview = obj.transform.GetComponentInChildren <EnergyRangePreview> ();
+				if (energyRangePreview != null)
+					drawEnergyConnections (energyRangePreview);
+
+				var minningRangePreview = obj.transform.GetComponentInChildren <MiningRangePreview> ();
+				if (minningRangePreview != null)
+					drawMiningConnections (minningRangePreview);
 
 				lastPointOver = obj;
 			}
@@ -56,9 +62,9 @@ public class EffectManager : MonoBehaviour {
 		}
 	}
 		
-	void drawConnections(Vector3 start, IEnumerable<Vector3> ends){
+	void drawConnections(Vector3 start, IEnumerable<Vector3> ends, Color connectionColor, LineRenderer linePrefab){
 		foreach(var p in ends){
-			makeLine (connectionLinePrefab, start, p, connectionColor, connectionColor,
+			makeLine (linePrefab, start, p, connectionColor, connectionColor,
 				connectionWidth, 0, pointOverEffectObject, "Connection");
 		}
 	}
@@ -67,13 +73,19 @@ public class EffectManager : MonoBehaviour {
 		var node = tower.energyNode;
 		var start = node.transform.position;
 		var ends = node.targetNodes.Select (n => n.transform.position);
-		drawConnections (start,ends);
+		drawConnections (start,ends, energyConnectionColor, energyconnectionPrefab);
 	}
 
-	void drawPreivewConnections(RangePreview preview){
+	void drawEnergyConnections(EnergyRangePreview preview){
 		var start = preview.transform.position;
 		var ends = preview.connections.Select (n => n.transform.position);
-		drawConnections (start,ends);
+		drawConnections (start,ends, energyConnectionColor, energyconnectionPrefab);
+	}
+
+	void drawMiningConnections(MiningRangePreview preview){
+		var start = preview.transform.position;
+		var ends = preview.ores.Select (n => n.transform.position);
+		drawConnections (start,ends, miningConnectionColor, miningConnectionPrefab);
 	}
 
 	public static LineRenderer makeLine(LineRenderer prefab ,Vector3 start, Vector3 end, Color colorStart, Color colorEnd,
