@@ -12,6 +12,10 @@ public class EffectManager : MonoBehaviour {
 
 	public LineRenderer connectionLinePrefab;
 	public GameObject emptyPrefab;
+	public RangePreviewParent rangePrefab;
+	public EnergyRangePreview energyRangePrefab;
+	public AttackingRangePreview attackRangePrefab;
+	public MiningRangePreview miningRangePrefab;
 
 	void Start(){
 		pointOverEffectObject = Instantiate(emptyPrefab);
@@ -35,19 +39,37 @@ public class EffectManager : MonoBehaviour {
 
 				var tower = obj.GetComponent <Tower> ();
 				if (tower != null && tower.alive) {
-					mouseOverTower (tower);
-				}
+					showBasicEnergyConnections (tower);
 
-				var energyRangePreview = obj.transform.GetComponentInChildren <EnergyRangePreview> ();
-				if (energyRangePreview != null) {
-					var start = energyRangePreview.transform.position;
-					var isRedirector = energyRangePreview.isRedirector;
-					drawEnergyConnections (start, isRedirector, energyRangePreview.connections());
+					if(tower is Generator || tower is PowerRedirector){
+						if(tower is PowerRedirector){
+							//Draw Advanced Connections
+						}else{
+							//Draw Energy Range
+						}
+					} else if (tower is Miner){
+						//Draw minning Connections
+						//Draw minning range
+					} else if (tower is WeaponTower){
+						//Draw attacking Range.
+					}
+				}else{
+					var preview = obj.GetComponent <Preview> ();
+					if(preview!=null){
+						preview.drawEffects (this);
+					}
 				}
-
-				var minningRangePreview = obj.transform.GetComponentInChildren <MiningRangePreview> ();
-				if (minningRangePreview != null)
-					drawMiningConnections (minningRangePreview);
+					
+//				var energyRangePreview = obj.transform.GetComponentInChildren <EnergyRangePreview> ();
+//				if (energyRangePreview != null) {
+//					var start = energyRangePreview.transform.position;
+//					var isRedirector = energyRangePreview.isRedirector;
+//					drawEnergyConnections (start, isRedirector, energyRangePreview.connections());
+//				}
+//
+//				var minningRangePreview = obj.transform.GetComponentInChildren <MiningRangePreview> ();
+//				if (minningRangePreview != null)
+//					drawMiningConnections (minningRangePreview);
 
 				lastPointOver = obj;
 			}
@@ -65,6 +87,13 @@ public class EffectManager : MonoBehaviour {
 		}
 	}
 		
+	public void drawRange(Vector2 pos, float radius, Color rangeColor){
+		var energyRange = Instantiate (rangePrefab);
+		energyRange.init (pos, radius);
+		energyRange.GetComponent <Renderer>().material.color = rangeColor;
+		energyRange.transform.parent = pointOverEffectObject.transform;
+	}
+
 	void drawConnections(Vector3 start, IEnumerable<Vector3> ends, Color connectionColor, ConnectionMode mode, string lineName){
 		foreach(var p in ends){
 			makeLine (start, p, connectionColor, connectionWidth, mode, pointOverEffectObject, lineName);
@@ -86,7 +115,7 @@ public class EffectManager : MonoBehaviour {
 		}
 	}
 
-	void mouseOverTower(Tower tower){
+	void showBasicEnergyConnections(Tower tower){
 		var node = tower.energyNode;
 		var start = node.transform.position;
 		drawEnergyConnections (start, tower.isRedirector, node.targetNodes);
