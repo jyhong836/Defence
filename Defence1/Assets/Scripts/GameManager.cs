@@ -146,25 +146,6 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
-	public Tower getPrefabOfType(Towers t){
-		switch(t){
-		case Towers.Miner:
-			return minerPrefab;
-		case Towers.LaserTower:
-			return laserTowerPrefab;
-		case Towers.CannonTower:
-			return cannonTowerPrefab;
-		case Towers.FireTower:
-			return fireTowerPrefab;
-		case Towers.Generator:
-			return generatorPrefab;
-		case Towers.Redirector:
-			return redirectorPrefab;
-		default:
-			throw new UnityException ("Can't find prefab of this type!");
-		}
-	}
-
 	public ConstructingTower createConstructingTower(Vector2 pos, Towers towerType, GameObject model){
 		model.transform.parent = towerParent.transform;
 		var t = model.AddComponent<ConstructingTower> ();
