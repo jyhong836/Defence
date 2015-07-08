@@ -3,14 +3,14 @@ using System.Collections;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 public class EffectManager : MonoBehaviour {
-	public static Color energyConnectionColor = new Color (0.3f, 0.3f, 1f);
+	public static Color energyConnectionColor = new Color(52f/255,244f/255,236f/255);
 	public static Color miningConnectionColor = Color.yellow;
 	public static float connectionWidth = 0.35f;
 
-	public LineRenderer energyconnectionPrefab;
-	public LineRenderer miningConnectionPrefab;
+	public LineRenderer connectionLinePrefab;
 	public GameObject emptyPrefab;
 
 	void Start(){
@@ -39,8 +39,11 @@ public class EffectManager : MonoBehaviour {
 				}
 
 				var energyRangePreview = obj.transform.GetComponentInChildren <EnergyRangePreview> ();
-				if (energyRangePreview != null)
-					drawEnergyConnections (energyRangePreview);
+				if (energyRangePreview != null) {
+					var start = energyRangePreview.transform.position;
+					var isRedirector = energyRangePreview.isRedirector;
+					drawEnergyConnections (start, isRedirector, energyRangePreview.connections);
+				}
 
 				var minningRangePreview = obj.transform.GetComponentInChildren <MiningRangePreview> ();
 				if (minningRangePreview != null)
@@ -62,46 +65,78 @@ public class EffectManager : MonoBehaviour {
 		}
 	}
 		
-	void drawConnections(Vector3 start, IEnumerable<Vector3> ends, Color connectionColor, LineRenderer linePrefab){
+	void drawConnections(Vector3 start, IEnumerable<Vector3> ends, Color connectionColor, ConnectionMode mode, string lineName){
 		foreach(var p in ends){
-			makeLine (linePrefab, start, p, connectionColor, connectionColor,
-				connectionWidth, 0, pointOverEffectObject, "Connection");
+			makeLine (start, p, connectionColor, connectionWidth, mode, pointOverEffectObject, lineName);
+		}
+	}
+
+	void drawEnergyConnections(Vector3 start, bool isThisRedirector, IEnumerable<EnergyNode> targets){
+		foreach (var node in targets) {
+			var end = node.transform.position;
+			ConnectionMode mode;
+			if (isThisRedirector == node.isRedirector)
+				mode = ConnectionMode.Standard;
+			else if (isThisRedirector)
+				mode = ConnectionMode.Send;
+			else
+				mode = ConnectionMode.Receieve;
+			
+			makeLine (start, end, energyConnectionColor, connectionWidth, mode, pointOverEffectObject, "Energy Flow");
 		}
 	}
 
 	void mouseOverTower(Tower tower){
 		var node = tower.energyNode;
 		var start = node.transform.position;
-		var ends = node.targetNodes.Select (n => n.transform.position);
-		drawConnections (start,ends, energyConnectionColor, energyconnectionPrefab);
-	}
-
-	void drawEnergyConnections(EnergyRangePreview preview){
-		var start = preview.transform.position;
-		var ends = preview.connections.Select (n => n.transform.position);
-		drawConnections (start,ends, energyConnectionColor, energyconnectionPrefab);
+		drawEnergyConnections (start, tower.isRedirector, node.targetNodes);
 	}
 
 	void drawMiningConnections(MiningRangePreview preview){
 		var start = preview.transform.position;
 		var ends = preview.ores.Select (n => n.transform.position);
-		drawConnections (start,ends, miningConnectionColor, miningConnectionPrefab);
+		drawConnections (start,ends, miningConnectionColor, ConnectionMode.Receieve, "Ore Flow");
 	}
 
-	public static LineRenderer makeLine(LineRenderer prefab ,Vector3 start, Vector3 end, Color colorStart, Color colorEnd,
-		float widthStart, float widthEnd, GameObject parent, string lineName){
+	public LineRenderer makeLine(Vector3 start, Vector3 end, Color color,
+		float lineWidth, ConnectionMode mode, GameObject parent, string lineName){
 
-		var render = Instantiate (prefab);
+		var render = Instantiate (connectionLinePrefab);
+		render.material.color = color;
 		var lineObj = render.gameObject;
 		lineObj.transform.parent = parent.transform;
 		lineObj.name = lineName;
 
+		var smallWidth = lineWidth / 5;
+		float startWidth, endWidth;
+		switch(mode){
+		case ConnectionMode.Standard:
+			startWidth = lineWidth;
+			endWidth = lineWidth;
+			break;
+		case ConnectionMode.Send:
+			startWidth = lineWidth;
+			endWidth = smallWidth;
+			break;
+		case ConnectionMode.Receieve:
+			startWidth = smallWidth;
+			endWidth = lineWidth;
+			break;
+		default:
+			throw new NotImplementedException ();
+		}
+
 		render.SetVertexCount (2);
 		render.SetPosition (0, start);
 		render.SetPosition (1, end);
-		render.SetColors (colorStart, colorEnd);
-		render.SetWidth (widthStart,widthEnd);
+		render.SetWidth (startWidth,endWidth);
 
 		return render;
+	}
+
+	public enum ConnectionMode{
+		Standard,
+		Send,
+		Receieve
 	}
 }
