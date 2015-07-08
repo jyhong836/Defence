@@ -4,7 +4,7 @@ using System.Collections;
 /// <summary>
 /// Fire tower, a range attacking tower.
 /// </summary>
-public class FireTower : Tower {
+public class FireTower : WeaponTower {
 	public ParticleSystem fireSystem;
 
 	protected override bool isFiring {

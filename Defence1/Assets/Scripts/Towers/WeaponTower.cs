@@ -7,7 +7,7 @@ public enum TowerMode {
 	AttackOnce // whill attack until out of power, not resume.
 }
 
-public class Tower : TowerParent {
+public class WeaponTower : Tower {
 	
 	[SerializeField] protected Enemy currentTarget;
 	protected bool isTargetOutOfRange {

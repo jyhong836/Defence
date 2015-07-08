@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Generator : TowerParent {
+public class Generator : Tower {
 
 	public readonly static float outputInterval = 2;
 	public readonly static float outputAmount = 100;

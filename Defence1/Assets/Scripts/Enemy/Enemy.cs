@@ -30,7 +30,7 @@ public class Enemy : MonoBehaviour {
 	private Vector3 direction;
 	private Rigidbody _rigidbody;
 
-	private Tower currentTarget;
+	private WeaponTower currentTarget;
 
 	public void init(Vector2 pos) {
 		transform.position = Vector3Extension.fromVec2 (pos);
@@ -75,7 +75,7 @@ public class Enemy : MonoBehaviour {
 		if (colliders.Length > 0) {
 			//random pick one
 			var index = UnityEngine.Random.Range (0, colliders.Length);
-			var tower = colliders [index].gameObject.GetComponent <Tower>();
+			var tower = colliders [index].gameObject.GetComponent <WeaponTower>();
 			currentTarget = tower;
 		} else {
 			currentTarget = null;

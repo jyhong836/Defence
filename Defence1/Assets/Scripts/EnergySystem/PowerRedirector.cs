@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PowerRedirector : TowerParent {
+public class PowerRedirector : Tower {
 
 	public override float maxPower () {
 		throw new UnityException ("This method shouldn't be called!");

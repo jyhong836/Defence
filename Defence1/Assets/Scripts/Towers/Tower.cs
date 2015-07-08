@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine.EventSystems;
 
-public abstract class TowerParent : MonoBehaviour {
+public abstract class Tower : MonoBehaviour {
 
 	public bool destroyed { get{ return !alive;}}
 	public bool alive { get; private set;}

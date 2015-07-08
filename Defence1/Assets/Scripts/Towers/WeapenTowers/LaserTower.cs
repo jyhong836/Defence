@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class LaserTower : Tower {
+public class LaserTower : WeaponTower {
 	public LaserEffect attackingaLaser;
 
 	protected override bool isFiring {

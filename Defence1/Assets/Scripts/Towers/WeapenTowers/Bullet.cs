@@ -20,6 +20,7 @@ public class Bullet : MonoBehaviour {
 		distance = direction.magnitude;
 		direction.Normalize ();
 		direction *= speed;
+		// FIXME the bullet direction is wront. maybe the front vec should be modified
 		this.transform.Rotate(new Vector3(0, RotationMath.directionOf(new Vector2(direction.x, direction.z)),0));
 
 		this.injury = injury;

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class CannonTower : Tower {
+public class CannonTower : WeaponTower {
 	public Bullet bulletPrefab;
 	public float bulletSpeed;
 	public float bulletAttackingRadius;

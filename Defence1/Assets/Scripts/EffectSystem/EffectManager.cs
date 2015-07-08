@@ -31,7 +31,7 @@ public class EffectManager : MonoBehaviour {
 			if (obj != lastPointOver || obj.tag == "Preview") { //Previews need to be refresh every frame.
 				clearPointOverObject ();
 
-				var tower = obj.GetComponent <TowerParent> ();
+				var tower = obj.GetComponent <Tower> ();
 				if (tower != null && tower.alive) {
 					mouseOverTower (tower);
 				}
@@ -63,7 +63,7 @@ public class EffectManager : MonoBehaviour {
 		}
 	}
 
-	void mouseOverTower(TowerParent tower){
+	void mouseOverTower(Tower tower){
 		var node = tower.energyNode;
 		var start = node.transform.position;
 		var ends = node.targetNodes.Select (n => n.transform.position);

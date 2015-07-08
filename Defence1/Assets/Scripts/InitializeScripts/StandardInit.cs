@@ -7,7 +7,7 @@ public class StandardInit : InitializeScript {
 		manager.createGenerator (Vector2.zero);
 		manager.createPowerRedirector (new Vector2(6,0));
 		manager.createPowerRedirector (new Vector2(-6,0));
-		manager.createTower (new Vector2(0, -4));
+//		manager.createTower (new Vector2(0, -4));
 
 	}
 

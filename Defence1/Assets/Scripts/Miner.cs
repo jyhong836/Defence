@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-public class Miner : TowerParent {
+public class Miner : Tower {
 	
 	public static readonly float oreCollectSpeed = 2; 
 	public static readonly float oreUpdateInterval = 0.5f;
@@ -23,7 +23,6 @@ public class Miner : TowerParent {
 				_isFiring = value;
 				miningLaser.showEffect = value;
 				if(value){
-					Debug.Log("shoot");
 					miningLaser.setEndpoints (firePoint, currentTarget.transform.position);
 				}
 			}

@@ -90,7 +90,7 @@ public class UIManager : MonoBehaviour {
 		previewState = Towers.Redirector;
 	}
 		
-	Preview makePreview<T> (T prefab) where T: TowerParent{
+	Preview makePreview<T> (T prefab) where T: Tower{
 		var obj = Instantiate (prefab.gameObject);
 		var tower = obj.GetComponent<T> ();
 		destroyOptionally (tower);

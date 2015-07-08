@@ -8,13 +8,13 @@ public class EnergyNode : MonoBehaviour {
 	public static readonly float transmissionRadius = 10;
 	static readonly Color connectionColor = new Color(0.3f,0.3f,1.0f);
 
-	public TowerParent tower;
+	public Tower tower;
 	public bool isRedirector {get{ return tower.isRedirector;}} 
 
 	public List<EnergyNode> targetNodes = new List<EnergyNode>();
 	Func<float,float> energyArrived;
 
-	public void init(Func<float,float> energyArriveCallback, TowerParent tower){
+	public void init(Func<float,float> energyArriveCallback, Tower tower){
 		if (tower == null)
 			throw new ArgumentNullException ("tower");
 		this.energyArrived = energyArriveCallback;

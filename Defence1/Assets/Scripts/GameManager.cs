@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour {
 	public GameObject emptyPrefab;
 	public GameObject orePrefab;
 	public Miner minerPrefab;
-	public Tower towerPrefab;
+	public WeaponTower towerPrefab;
 	public LaserTower laserTowerPrefab;
 	public CannonTower cannonTowerPrefab;
 	public FireTower fireTowerPrefab;
@@ -75,7 +75,7 @@ public class GameManager : MonoBehaviour {
 		mapGen.generateOres ();
 	}
 
-	T instantiateUnderParent<T> (T prefab) where T: TowerParent{
+	T instantiateUnderParent<T> (T prefab) where T: Tower{
 		var t = Instantiate (prefab);
 		t.transform.parent = towerParent.transform;
 		return t;
@@ -87,25 +87,25 @@ public class GameManager : MonoBehaviour {
 		return miner;
 	}
 	#region These Tower methods can be merged.
-	public Tower createTower(Vector2 pos){
+	public WeaponTower createTower(Vector2 pos){
 		var tower = instantiateUnderParent (towerPrefab);
 		tower.init (pos);
 		return tower;
 	}
 	
-	public Tower createLaserTower(Vector2 pos){
+	public WeaponTower createLaserTower(Vector2 pos){
 		var tower = instantiateUnderParent (laserTowerPrefab);
 		tower.init (pos);
 		return tower;
 	}
 	
-	public Tower createCannonTower(Vector2 pos){
+	public WeaponTower createCannonTower(Vector2 pos){
 		var tower = instantiateUnderParent (cannonTowerPrefab);
 		tower.init (pos);
 		return tower;
 	}
 	
-	public Tower createFireTower(Vector2 pos){
+	public WeaponTower createFireTower(Vector2 pos){
 		var tower = instantiateUnderParent (fireTowerPrefab);
 		tower.init (pos);
 		return tower;
