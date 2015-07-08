@@ -33,6 +33,10 @@ public class Preview : MonoBehaviour {
 		}
 	}
 
+	public void addRange(RangePreviewParent r){
+		ranges.Add (r);
+	}
+
 	void OnTriggerEnter(Collider other) {
 		collisionNum += 1;	
 	}

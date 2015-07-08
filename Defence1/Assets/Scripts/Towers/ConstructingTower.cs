@@ -3,16 +3,21 @@ using System.Collections;
 using System;
 
 public class ConstructingTower : Tower {
+
 	public float constructionPower;
 	public Func<Tower> createTower;
 	public Tower successor { get; private set;} // The new tower created should be set to this.
 
+	Renderer render;
+
 	public void init(Vector2 pos ,float powerNeed, Func<Tower> createTower){
 		initParent (pos);
 
+		render = GetComponent <Renderer>();
 		this.constructionPower = powerNeed;
 		this.createTower = createTower;
 		powerLeft = 0; //This is needed.
+		changeColorAccordingEnergy ();
 	}
 
 
@@ -20,8 +25,15 @@ public class ConstructingTower : Tower {
 		return constructionPower;
 	}
 
+	void changeColorAccordingEnergy(){
+		var ratio = powerLeft / maxPower ();
+		render.material.color = Color.Lerp (EnergyPoint.lowColor, EnergyPoint.highColor, ratio);
+	}
+
 	protected override float energyArrive (float amount){
 		var energyReturned = base.energyArrive (amount);
+		changeColorAccordingEnergy ();
+
 		if(energyReturned > 1e-4f){
 			energyFulled ();
 		}

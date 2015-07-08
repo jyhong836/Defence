@@ -3,8 +3,6 @@ using System.Collections.Generic;
 
 public class MiningRangePreview : RangePreviewParent {
 
-	public List<Ore> ores = new List<Ore>();
-
 	public override float upOffset {
 		get { return 0f; }
 	}
@@ -13,13 +11,14 @@ public class MiningRangePreview : RangePreviewParent {
 		base.init (parent,radius);
 	}
 
-	void Update() {
-		ores.Clear ();
+	public List<Ore> oresInRange() {
+		var ores = new List<Ore>();
 
 		var colliders = Physics.OverlapSphere (transform.position,radius,Masks.Ore);
 		foreach(var c in colliders){
 			var ore = c.gameObject.GetComponent<Ore> ();
 			ores.Add (ore);
 		}
+		return ores;
 	}
 }

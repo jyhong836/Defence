@@ -67,7 +67,7 @@ public class UIManager : MonoBehaviour {
 	}
 	
 	public void TowerButtonClicked(){
-		previewState = Towers.Tower;
+		Debug.Log ("Tower is deprecated now. Please use its children.");
 	}
 	
 	public void LaserTowerButtonClicked(){
@@ -107,8 +107,7 @@ public class UIManager : MonoBehaviour {
 		var showRange = prefab is Generator || prefab is PowerRedirector;
 		var energyRange = Instantiate (energyRangePrefab);
 		energyRange.init (obj.transform, EnergyNode.transmissionRadius, tower.isRedirector, showRange);
-
-		preview.ranges.Add (energyRange);
+		preview.addRange (energyRange);
 
 		return preview;
 	}
@@ -118,6 +117,7 @@ public class UIManager : MonoBehaviour {
 
 		var attackRange = Instantiate (attackRangePrefab);
 		attackRange.init (preview.transform, prefab.attackingRadius);
+		preview.addRange (attackRange);
 		return preview;
 	}
 
@@ -126,7 +126,7 @@ public class UIManager : MonoBehaviour {
 
 		var miningRange = Instantiate (miningRangePrefab);
 		miningRange.init (preview.transform, Miner.workingRadius);
-
+		preview.addRange (miningRange);
 		return preview;
 	}
 

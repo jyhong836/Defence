@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class EnergyRangePreview : RangePreviewParent {
-	public List<EnergyNode> connections = new List<EnergyNode>();
 	public bool isRedirector;
 
 	public override float upOffset {
@@ -17,8 +16,8 @@ public class EnergyRangePreview : RangePreviewParent {
 		mesh.enabled = showRange;
 	}
 
-	void Update() {
-		connections.Clear ();
+	public List<EnergyNode> connections() {
+		var connections = new List<EnergyNode> ();
 
 		var colliders = Physics.OverlapSphere (transform.position,radius);
 		foreach(var c in colliders){
@@ -27,5 +26,6 @@ public class EnergyRangePreview : RangePreviewParent {
 				connections.Add (node);
 			}
 		}
+		return connections;
 	}
 }

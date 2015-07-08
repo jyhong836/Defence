@@ -42,7 +42,7 @@ public class EffectManager : MonoBehaviour {
 				if (energyRangePreview != null) {
 					var start = energyRangePreview.transform.position;
 					var isRedirector = energyRangePreview.isRedirector;
-					drawEnergyConnections (start, isRedirector, energyRangePreview.connections);
+					drawEnergyConnections (start, isRedirector, energyRangePreview.connections());
 				}
 
 				var minningRangePreview = obj.transform.GetComponentInChildren <MiningRangePreview> ();
@@ -94,7 +94,7 @@ public class EffectManager : MonoBehaviour {
 
 	void drawMiningConnections(MiningRangePreview preview){
 		var start = preview.transform.position;
-		var ends = preview.ores.Select (n => n.transform.position);
+		var ends = preview.oresInRange().Select (n => n.transform.position);
 		drawConnections (start,ends, miningConnectionColor, ConnectionMode.Receieve, "Ore Flow");
 	}
 
