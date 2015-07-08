@@ -1,31 +1,46 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class EnemyManager : MonoBehaviour {
+public class EnemyManager : MonoBehaviour, IEnemySpawner {
 
 	public GameManager gameManager;
 	public Enemy enemyPrefab;
-	public float enemyUpdateInterval = 1f; // sec
-	private float nextEnemyTime = 0;
-	private bool startGenerate = true; // false;
+
+	EnemySpawnMethod method;
+	Transform enemyParent;
+
+	void Start(){
+		var obj = Instantiate (gameManager.emptyPrefab);
+		obj.name = "Enemies";
+		enemyParent = obj.transform;
+
+		method = new EnemySpawnMethod (this, gameManager.mapSize, initSpawnInterval: 10, spawnIntervalDecayTime: 100);
+	}
 
 	void FixedUpdate() {
-		if (startGenerate)
-			if (nextEnemyTime <= 0) {
-				createEnemy (gameManager.randomPosAtBound ());
-				nextEnemyTime += Random.value * enemyUpdateInterval;
-			} else {
-				nextEnemyTime -= Time.fixedDeltaTime;
-			}
+		method.timePassed (Time.fixedDeltaTime);
 	}
 
-	public void startGenerateEnemy (bool start) {
-		startGenerate = start;
-	}
-
-	public Enemy createEnemy(Vector2 pos) {
+	Enemy createEnemy(Vector2 pos) {
 		var enemy = Instantiate (enemyPrefab);
-		enemy.init(gameManager.randomPosAtBound());
+		enemy.init(pos);
+
+		enemy.transform.parent = enemyParent;
 		return enemy;
 	}
+
+	#region IEnemySpawner implementation
+
+	public bool spawnEnemyOfStrength (float strength, Vector2 pos){
+		var enemyRadius = 1f;
+		if (Physics.OverlapSphere (pos, enemyRadius).Length > 0)
+			return false;
+		else{
+//			Debug.Log ("spawn with strength: " + strength);
+			createEnemy (pos); // need enhancements.
+			return true;
+		}
+	}
+
+	#endregion
 }
