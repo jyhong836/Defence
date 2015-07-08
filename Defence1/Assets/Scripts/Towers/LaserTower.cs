@@ -4,7 +4,6 @@ using System.Collections;
 public class LaserTower : Tower {
 	public LaserEffect attackingaLaser;
 
-	private bool _isFiring;
 	protected override bool isFiring {
 		get {return isFiring;} 
 		set {
@@ -13,6 +12,7 @@ public class LaserTower : Tower {
 				attackingaLaser.showEffect = value;
 				if(value){
 					attackingaLaser.setEndpoints (firePoint, currentTarget.transform.position);
+					currentTarget.lifeLeft -= injury;
 				}
 			}
 		}

@@ -6,8 +6,7 @@ using System.Collections;
 /// </summary>
 public class FireTower : Tower {
 	public ParticleSystem fireSystem;
-	
-	private bool _isFiring;
+
 	protected override bool isFiring {
 		get {return isFiring;} 
 		set {
@@ -17,7 +16,7 @@ public class FireTower : Tower {
 					if (!fireSystem.isPlaying) 
 						fireSystem.Play();
 				} else {
-					if (!fireSystem.isStopped)
+					if (!fireSystem.isStopped) 
 						fireSystem.Stop();
 				}
 			}
