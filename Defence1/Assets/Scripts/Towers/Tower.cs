@@ -19,6 +19,7 @@ public abstract class Tower : MonoBehaviour {
 			energyNode.clearAllConnections ();
 
 			alive = false;
+			gameObject.SetActive (false);
 			Destroy (gameObject);
 		}
 	}

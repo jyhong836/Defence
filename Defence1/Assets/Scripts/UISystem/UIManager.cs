@@ -102,12 +102,14 @@ public class UIManager : MonoBehaviour {
 		var r = obj.AddComponent <Rigidbody> ();
 		r.isKinematic = true;
 
+		var preview = obj.AddComponent <Preview> ();
+
 		var showRange = prefab is Generator || prefab is PowerRedirector;
 		var energyRange = Instantiate (energyRangePrefab);
 		energyRange.init (obj.transform, EnergyNode.transmissionRadius, tower.isRedirector, showRange);
 
+		preview.ranges.Add (energyRange);
 
-		var preview = obj.AddComponent <Preview> ();
 		return preview;
 	}
 
@@ -159,46 +161,17 @@ public class UIManager : MonoBehaviour {
 				var pos = previewTower.transform.position;
 				var v2 = new Vector2 (pos.x, pos.z);
 
-				hidePreviewTowerWhileDoingThisAction (() => { //must hide the preview, or its layer will become a trouble.
-					switch (previewState) {
-					case Towers.Redirector:
-						gManager.createPowerRedirector (v2);
-						break;
-					case Towers.Miner:
-						gManager.createMiner (v2);
-						break;
-					case Towers.Tower:
-						gManager.createTower (v2);
-						break;
-					case Towers.LaserTower:
-						gManager.createLaserTower (v2);
-						break;
-					case Towers.CannonTower:
-						gManager.createCannonTower (v2);
-						break;
-					case Towers.FireTower:
-						gManager.createFireTower (v2);
-						break;
-					case Towers.Generator:
-						gManager.createGenerator (v2);
-						break;
-					default:
-						throw new UnityException ("Don't know what to create!");
-					}
-				});
-		
+				previewTower.gameObject.SetActive (false);
+
+				gManager.createConstructingTower (v2, previewState, previewTower.copyAModel());
+
+				previewTower.gameObject.SetActive (true);
 			}else{
 				var price = gManager.resourceControl.priceOf (previewState);
 				warning (string.Format ("You need at least {0} ore to place this tower.", price));
 			}
 
 		}
-	}
-
-	void hidePreviewTowerWhileDoingThisAction(Action doSomething){
-		previewTower.gameObject.SetActive (false);
-		doSomething ();
-		previewTower.gameObject.SetActive (true);
 	}
 
 	Coroutine fadeCoroutine;

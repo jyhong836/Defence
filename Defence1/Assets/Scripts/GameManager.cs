@@ -32,6 +32,7 @@ public class GameManager : MonoBehaviour {
 	public Generator generatorPrefab;
 	public PowerRedirector redirectorPrefab;
 	public EnergyPoint energyPointPrefab;
+	public ConstructingTower constructingTowerPrefab;
 	//Prefabs----------------
 
 	public bool shouldGenerateMap = true;
@@ -122,6 +123,36 @@ public class GameManager : MonoBehaviour {
 		var r = instantiateUnderParent (redirectorPrefab);
 		r.init (pos);
 		return r;
+	}
+
+	public Tower createTowerOfType(Vector2 pos, Towers towerType){
+		switch (towerType) {
+		case Towers.Redirector:
+			return createPowerRedirector (pos);
+		case Towers.Miner:
+			return createMiner (pos);
+		case Towers.Tower:
+			return createTower (pos);
+		case Towers.LaserTower:
+			return createLaserTower (pos);
+		case Towers.CannonTower:
+			return createCannonTower (pos);
+		case Towers.FireTower:
+			return createFireTower (pos);
+		case Towers.Generator:
+			return createGenerator (pos);
+		default:
+			throw new UnityException ("Don't know what to create!");
+		}
+	}
+
+	public ConstructingTower createConstructingTower(Vector2 pos, Towers towerType, GameObject model){
+		model.transform.parent = towerParent.transform;
+		var t = model.AddComponent<ConstructingTower> ();
+		t.init (pos, ConstructingTower.powerNeedToConstruct (towerType),
+			createTower: () => createTowerOfType (pos, towerType));
+
+		return t;
 	}
 		
 }
