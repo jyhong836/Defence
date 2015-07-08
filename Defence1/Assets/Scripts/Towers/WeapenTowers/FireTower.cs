@@ -28,7 +28,7 @@ public class FireTower : WeaponTower {
 		if (colliders.Length > 0) {
 			foreach (var collider in colliders) {
 				var enemy = collider.gameObject.GetComponent<Enemy> ();
-				enemy.lifeLeft -= injury;
+				enemy.hpControl.hp -= injury;
 			}
 			isFiring = true;
 

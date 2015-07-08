@@ -12,7 +12,7 @@ public class LaserTower : WeaponTower {
 				attackingaLaser.showEffect = value;
 				if(value){
 					attackingaLaser.setEndpoints (firePoint, currentTarget.transform.position);
-					currentTarget.lifeLeft -= injury;
+					currentTarget.hpControl.hp -= injury;
 				}
 			}
 		}

@@ -19,7 +19,7 @@ public class CannonTower : WeaponTower {
 	}
 
 	protected override float AttackTarget () {
-		if (currentTarget == null || currentTarget.lifeLeft <= 0 || isTargetOutOfRange) {
+		if (currentTarget == null || currentTarget.hpControl.hp <= 0 || isTargetOutOfRange) {
 			ChangeCurrentTarget ();
 		} else if (aimControl.ready) {
 			isFiring = true;

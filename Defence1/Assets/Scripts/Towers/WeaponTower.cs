@@ -29,7 +29,7 @@ public class WeaponTower : Tower {
 		set{
 			_isFiring = value;
 			if (value) {
-				currentTarget.lifeLeft -= injury;
+				currentTarget.hpControl.hp -= injury;
 			}
 		} 
 	}
@@ -80,19 +80,19 @@ public class WeaponTower : Tower {
 		}
 	}
 
-	// life	
-	[SerializeField] float life = 100;
-	public float lifeLeft {
-		get {
-			return life;
-		}
-		set {
-			life = value;
-			if (life<=0) {
-				destroySelf ();
-			}
-		}
-	}
+//	// life	
+//	[SerializeField] float life = 100;
+//	public float lifeLeft {
+//		get {
+//			return life;
+//		}
+//		set {
+//			life = value;
+//			if (life<=0) {
+//				destroySelf ();
+//			}
+//		}
+//	}
 	
 	public void init(Vector2 pos){
 		initParent (pos);
@@ -166,7 +166,7 @@ public class WeaponTower : Tower {
 	/// </summary>
 	/// <returns>Time interval.</returns>
 	protected virtual float AttackTarget () {
-		if (currentTarget == null || currentTarget.lifeLeft <= 0 || isTargetOutOfRange) {
+		if (currentTarget == null || currentTarget.hpControl.hp <= 0 || isTargetOutOfRange) {
 			ChangeCurrentTarget ();
 		} else if (aimControl.ready) {
 			isFiring = true;

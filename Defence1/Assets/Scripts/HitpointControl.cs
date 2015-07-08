@@ -2,12 +2,14 @@
 using System.Collections;
 using System;
 
-public class HitpointControl {
-	public float maxHitpoint;
-	float _hp;
+[Serializable] public class HitpointControl {
+	[SerializeField] public float maxHitpoint;
+	[SerializeField] float _hp;
 	public float hp { 
 		get{return _hp;} 
-		private set {
+		set {
+			if (value < _hp)
+				hurtedCallback (_hp - value);
 			_hp = value;
 			if(value < 0){
 				outOfHp (value);
@@ -15,12 +17,16 @@ public class HitpointControl {
 		}
 	}
 
-	Action<float> outOfHp;
+	Action<float> outOfHp; // outOfHp(remainHp);
+	Action<float> hurtedCallback; // hurtCallbakc(hurtHp);
 
-	public HitpointControl(float maxHp, float initHp, Action<float> outOfHp){
+	public void init(//float maxHp, float initHp, 
+		Action<float> outOfHp,
+		Action<float> hurtedCallback){
 		this.outOfHp = outOfHp;
-		this.maxHitpoint = maxHp;
-		hp = initHp;
+		this.hurtedCallback = hurtedCallback;
+//		this.maxHitpoint = maxHp;
+//		hp = initHp;
 	}
 
 }
