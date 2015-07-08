@@ -15,6 +15,10 @@ public static class Vector3Extension{
 		return new Vector3 (x, 0, y);
 	}
 
+	public static Vector2 toVec2( this Vector3 v3) {
+		return new Vector2 (v3.x, v3.z);
+	}
+
 	public static void setPos(this GameObject obj, float x, float y){
 		obj.transform.position = new Vector3 (x, 0, y);
 	}

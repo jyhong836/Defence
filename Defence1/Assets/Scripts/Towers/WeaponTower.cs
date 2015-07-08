@@ -9,43 +9,25 @@ public enum TowerMode {
 
 public class WeaponTower : Tower {
 	
-	[SerializeField] protected Enemy currentTarget;
-	protected bool isTargetOutOfRange {
-		get {
-			if (currentTarget==null)
-				return true;
-			Vector2 start = this.gameObject.getPos();
-			start -= currentTarget.gameObject.getPos();
-//			Debug.Log(start.sqrMagnitude+" " + attackingRadius);
-			return start.magnitude > attackingRadius;
-		}
-	}
+//	[SerializeField] protected Enemy currentTarget;
 	protected bool isAttacking = false;
-	
-	protected bool _isFiring;
-	protected virtual bool isFiring{ get{
-			return _isFiring;
-		} 
-		set{
-			_isFiring = value;
-			if (value) {
-				currentTarget.hpControl.hp -= injury;
-			}
-		} 
-	}
-	
-	[SerializeField] protected float attackingRadius = 8;
+
+	public AttackingControl attackControl;
+
+//	protected bool _isFiring;
+//	protected virtual bool isFiring{ get{
+//			return _isFiring;
+//		} 
+//		set{
+//			_isFiring = value;
+//			if (value) {
+//				
+//			}
+//		} 
+//	}
+
 	[SerializeField] protected float idlePowerUsage = 0.001f; // per sec
 	[SerializeField] protected float attackPowerUsage = 0.01f; // per sec
-	[SerializeField] protected float injury = 30;
-	[SerializeField] protected float attackInterval = 2;
-	[SerializeField] protected float rotateSpeed = 3;
-	[SerializeField] protected float fireAngle = 0.01f;
-
-	private float nextAttackTime;
-	
-	protected AimingControl aimControl;
-	public Transform rotationPart;
 
 	// mode
 	[SerializeField] TowerMode mode = TowerMode.Attack;
@@ -55,9 +37,9 @@ public class WeaponTower : Tower {
 			mode = value;
 			switch (mode) 
 			{
-				case TowerMode.Attack: StartAttack(); break;
-				case TowerMode.AttackOnce: StartAttack(); break;
-				case TowerMode.Idle: break;
+			case TowerMode.Attack: isAttacking = true; break;
+			case TowerMode.AttackOnce: isAttacking = true; break;
+			case TowerMode.Idle: break;
 //				default: Debug.Log("ERROR in Tower mode switch: Unknown Mode");
 			}
 		}
@@ -73,38 +55,20 @@ public class WeaponTower : Tower {
 			if (power>0) {
 				isOutOfPower = false;
 				if (mode==TowerMode.Attack) {
-					StartAttack ();
+					isAttacking = true;
 				}
 			} else 
 				isOutOfPower = true;
 		}
 	}
-
-//	// life	
-//	[SerializeField] float life = 100;
-//	public float lifeLeft {
-//		get {
-//			return life;
-//		}
-//		set {
-//			life = value;
-//			if (life<=0) {
-//				destroySelf ();
-//			}
-//		}
-//	}
 	
 	public void init(Vector2 pos){
 		initParent (pos);
-		
-		aimControl = 
-			new HorizontalRotationAimingControl (
-				rotateSpeed: () => rotateSpeed,
-				fireAngle: () => fireAngle,
-				rotateToDirection: RotationMath.RotatePart (rotationPart, 0f),
-				hasTarget: () => currentTarget!=null,
-				targetDirection: () => RotationMath.directionOf (currentTarget.getPos () - this.getPos ())
-				);
+		initAttackingControl ();
+	}
+
+	protected virtual void initAttackingControl() {
+		attackControl.init (AttackTargetType.Enemy, transform.position.toVec2(), null, null);
 	}
 
 	void FixedUpdate () {
@@ -113,7 +77,8 @@ public class WeaponTower : Tower {
 				isAttacking = false;
 			} else {
 				powerLeft -= attackPowerUsage*Time.fixedDeltaTime;
-				Attack();
+//				Attack();
+				attackControl.Attack();
 			}
 		} else if (!isOutOfPower) {
 			if (powerLeft < idlePowerUsage) {
@@ -127,76 +92,71 @@ public class WeaponTower : Tower {
 	// Use this for initialization
 	void Start () {
 		isAttacking = true; // FIXME attack start at begining
-		ChangeCurrentTarget ();
-		nextAttackTime = attackInterval;
+//		ChangeCurrentTarget ();
+//		
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if (isAttacking && currentTarget != null) {
-			var start = transform.position;
-			var end = currentTarget.transform.position;
-			if (aimControl.ready)
-				Debug.DrawLine (start,end,Color.red);
-			else
-				Debug.DrawLine (start,end,Color.green);
+		if (isAttacking) {
+			attackControl.DrawAttackLine ();
 		}
 	}
 
-	void StartAttack () {
-		if (currentTarget!=null)
-			isAttacking = true;
-		else {
-			ChangeCurrentTarget();
-		}
-	}
-
-	// control the attack time
-	protected void Attack () {
-		if (nextAttackTime <= 0) {
-			nextAttackTime += AttackTarget();
-		} else {
-			nextAttackTime -= Time.fixedDeltaTime;
-			isFiring = false;
-		}
-	}
-
-	/// <summary>
-	/// Attacks the target.
-	/// </summary>
-	/// <returns>Time interval.</returns>
-	protected virtual float AttackTarget () {
-		if (currentTarget == null || currentTarget.hpControl.hp <= 0 || isTargetOutOfRange) {
-			ChangeCurrentTarget ();
-		} else if (aimControl.ready) {
-			isFiring = true;
-			return attackInterval;
-		} else 
-			aimControl.updateOrientation (Time.fixedDeltaTime);
-		isFiring = false;
-		return 0;
-	}
-
-	/// <summary>
-	/// Changes the current target to a new enemy.
-	/// </summary>
-	/// <returns>Time for rotate to new target or 0.</returns>
-	protected virtual bool ChangeCurrentTarget () {
-		var colliders = Physics.OverlapSphere (transform.position,attackingRadius,Masks.Enemy);
-		if (colliders.Length > 0) {
-			//random pick one
-			var index = UnityEngine.Random.Range (0, colliders.Length);
-			var enemy = colliders [index].gameObject.GetComponent <Enemy>();
-			currentTarget = enemy;
+//	void StartAttack () {
+//		if (currentTarget!=null)
 //			isAttacking = true;
+//		else {
+//			ChangeCurrentTarget();
+//		}
+//	}
 
-			return true;
-		} else {
-			currentTarget = null;
-//			isAttacking = false;
-			return false;
-		}
-	}
+//	// control the attack time
+//	protected void Attack () {
+//		if (nextAttackTime <= 0) {
+//			nextAttackTime += AttackTarget();
+//		} else {
+//			nextAttackTime -= Time.fixedDeltaTime;
+//			isFiring = false;
+//		}
+//	}
+
+//	/// <summary>
+//	/// Attacks the target.
+//	/// </summary>
+//	/// <returns>Time interval.</returns>
+//	protected virtual float AttackTarget () {
+//		if (currentTarget == null || currentTarget.hpControl.hp <= 0 || isTargetOutOfRange) {
+//			ChangeCurrentTarget ();
+//		} else if (aimControl.ready) {
+//			isFiring = true;
+//			return attackInterval;
+//		} else 
+//			aimControl.updateOrientation (Time.fixedDeltaTime);
+//		isFiring = false;
+//		return 0;
+//	}
+
+//	/// <summary>
+//	/// Changes the current target to a new enemy.
+//	/// </summary>
+//	/// <returns>Time for rotate to new target or 0.</returns>
+//	protected virtual bool ChangeCurrentTarget () {
+//		var colliders = Physics.OverlapSphere (transform.position,attackingRadius,Masks.Enemy);
+//		if (colliders.Length > 0) {
+//			//random pick one
+//			var index = UnityEngine.Random.Range (0, colliders.Length);
+//			var enemy = colliders [index].gameObject.GetComponent <Enemy>();
+//			currentTarget = enemy;
+////			isAttacking = true;
+//
+//			return true;
+//		} else {
+//			currentTarget = null;
+////			isAttacking = false;
+//			return false;
+//		}
+//	}
 
 	#region implemented abstract members of TowerParent
 	public override float maxPower ()

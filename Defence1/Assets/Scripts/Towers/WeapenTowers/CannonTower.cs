@@ -6,27 +6,40 @@ public class CannonTower : WeaponTower {
 	public float bulletSpeed;
 	public float bulletAttackingRadius;
 
-	protected override bool isFiring {
-		get {return isFiring;} 
-		set {
-			if(_isFiring != value){
-				var bullet = Instantiate(bulletPrefab);
-				bullet.init (this.gameObject.transform.position, bulletSpeed, 
-				             currentTarget.gameObject.transform.position, injury,
-				             bulletAttackingRadius);
-			}
-		}
+	protected override void initAttackingControl() {
+		attackControl.init (AttackTargetType.Enemy,
+			transform.position.toVec2(), 
+			(fire, currentTarget, injury) => {
+				if (fire) {
+					var bullet = Instantiate(bulletPrefab);
+					bullet.init (this.gameObject.transform.position, bulletSpeed, 
+						Vector3Extension.fromVec2(currentTarget.objectPosition), injury,
+						bulletAttackingRadius);
+				}
+			}, null);
 	}
+//
+//	protected override bool isFiring {
+//		get {return isFiring;} 
+//		set {
+//			if(_isFiring != value){
+//				var bullet = Instantiate(bulletPrefab);
+//				bullet.init (this.gameObject.transform.position, bulletSpeed, 
+//				             currentTarget.gameObject.transform.position, injury,
+//				             bulletAttackingRadius);
+//			}
+//		}
+//	}
 
-	protected override float AttackTarget () {
-		if (currentTarget == null || currentTarget.hpControl.hp <= 0 || isTargetOutOfRange) {
-			ChangeCurrentTarget ();
-		} else if (aimControl.ready) {
-			isFiring = true;
-			return attackInterval;
-		} else 
-			aimControl.updateOrientation (Time.fixedDeltaTime);
-		isFiring = false;
-		return 0;
-	}
+//	protected override float AttackTarget () {
+//		if (currentTarget == null || currentTarget.hpControl.hp <= 0 || isTargetOutOfRange) {
+//			ChangeCurrentTarget ();
+//		} else if (aimControl.ready) {
+//			isFiring = true;
+//			return attackInterval;
+//		} else 
+//			aimControl.updateOrientation (Time.fixedDeltaTime);
+//		isFiring = false;
+//		return 0;
+//	}
 }

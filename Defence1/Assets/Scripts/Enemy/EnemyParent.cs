@@ -15,10 +15,9 @@ public class EnemyParent : MonoBehaviour {
 	protected WeaponTower currentTarget;
 
 	public void initParent(Vector2 pos) {
-		transform.position = Vector3Extension.fromVec2 (pos);
-		hpControl.init ((value) => destroySelf (this.gameObject),
-			(value) => {}
-		);
+		alive = true;
+		this.setPos (pos.x,pos.y);
+		hpControl.init ((value) => destroySelf (), (value) => {}, transform.position.toVec2());
 	}
 
 	public bool destroyed { get{ return !alive;}}
