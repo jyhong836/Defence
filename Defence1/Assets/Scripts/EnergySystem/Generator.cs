@@ -7,11 +7,6 @@ public class Generator : Tower {
 	public readonly static float outputAmount = 100;
 
 	float outputTimer = 0;
-	
-	public void init(Vector2 pos){
-		initParent (pos);
-
-	}
 
 	void FixedUpdate() {
 		if(outputTimer >= outputInterval){

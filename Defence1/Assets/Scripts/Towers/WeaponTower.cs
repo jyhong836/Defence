@@ -62,8 +62,7 @@ public class WeaponTower : Tower {
 		}
 	}
 	
-	public void init(Vector2 pos){
-		initParent (pos);
+	protected override void init(Vector2 pos){
 		initAttackingControl ();
 	}
 

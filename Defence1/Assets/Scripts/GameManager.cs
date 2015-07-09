@@ -82,66 +82,11 @@ public class GameManager : MonoBehaviour {
 		return t;
 	}
 
-	public Miner createMiner(Vector2 pos){
-		var miner = instantiateUnderParent (minerPrefab);
-		miner.init (pos: pos, oreCollected: delta => resourceControl.tryChangeOre (delta));
-		return miner;
-	}
-	#region These Tower methods can be merged.
-	public WeaponTower createTower(Vector2 pos){
-		var tower = instantiateUnderParent (towerPrefab);
-		tower.init (pos);
-		return tower;
-	}
-	
-	public WeaponTower createLaserTower(Vector2 pos){
-		var tower = instantiateUnderParent (laserTowerPrefab);
-		tower.init (pos);
-		return tower;
-	}
-	
-	public WeaponTower createCannonTower(Vector2 pos){
-		var tower = instantiateUnderParent (cannonTowerPrefab);
-		tower.init (pos);
-		return tower;
-	}
-	
-	public WeaponTower createFireTower(Vector2 pos){
-		var tower = instantiateUnderParent (fireTowerPrefab);
-		tower.init (pos);
-		return tower;
-	}
-	#endregion
-
-	public Generator createGenerator(Vector2 pos){
-		var station = instantiateUnderParent (generatorPrefab);
-		station.init (pos);
-		return station;
-	}
-
-	public PowerRedirector createPowerRedirector(Vector2 pos){
-		var r = instantiateUnderParent (redirectorPrefab);
-		r.init (pos);
-		return r;
-	}
-
 	public Tower createTowerOfType(Vector2 pos, TowerType towerType){
-		switch (towerType) {
-		case TowerType.Redirector:
-			return createPowerRedirector (pos);
-		case TowerType.Miner:
-			return createMiner (pos);
-		case TowerType.LaserTower:
-			return createLaserTower (pos);
-		case TowerType.CannonTower:
-			return createCannonTower (pos);
-		case TowerType.FireTower:
-			return createFireTower (pos);
-		case TowerType.Generator:
-			return createGenerator (pos);
-		default:
-			throw new UnityException ("Don't know what to create!");
-		}
+		var prefab = getPrefabOfType (towerType);
+		var r = instantiateUnderParent (prefab);
+		r.create (pos);
+		return r;
 	}
 
 	public Tower getPrefabOfType(TowerType t){

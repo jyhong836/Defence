@@ -4,11 +4,10 @@ using System.Collections;
 public class StandardInit : InitializeScript {
 
 	public override void initialize (GameManager manager){
-		manager.createGenerator (Vector2.zero);
-		manager.createPowerRedirector (new Vector2(6,0));
-		manager.createPowerRedirector (new Vector2(-6,0));
-//		manager.createTower (new Vector2(0, -4));
-
+		manager.createTowerOfType (Vector2.zero, TowerType.Generator);
+		manager.createTowerOfType (new Vector2(6,0), TowerType.Redirector);
+		manager.createTowerOfType (new Vector2(-6,0), TowerType.Redirector);
+		manager.createTowerOfType (new Vector2(0,-5),TowerType.LaserTower);
 	}
 
 	public override int initOre(){

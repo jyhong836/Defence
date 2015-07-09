@@ -30,6 +30,13 @@ public abstract class Tower : MonoBehaviour {
 		destroySelf (GameManager.Get);
 	}
 
+	public void create(Vector2 pos){
+		initParent (pos);
+		init (pos);
+	}
+
+	protected virtual void init (Vector2 pos){}
+
 	protected virtual void cleanUp(GameManager manager) {} 
 
 	/// <summary>
