@@ -8,7 +8,9 @@ public class UIManager : MonoBehaviour {
 	public GameManager gManager;
 	public Text oreText;
 	public Text warningText;
-	public RangePreview rangePreviewPrefab;
+	public EnergyRangePreview energyRangePrefab;
+	public AttackingRangePreview attackRangePrefab;
+	public MiningRangePreview miningRangePrefab;
 
 	[SerializeField] Towers _placementState = Towers.None;
 	[SerializeField] float fadeOutTime = 2;
@@ -27,19 +29,19 @@ public class UIManager : MonoBehaviour {
 					previewTower = null;
 					break;
 				case Towers.Miner:
-					previewTower = makePreview (gManager.minerPrefab);
+					previewTower = makeMinerPreview (gManager.minerPrefab);
 					break;
-				case Towers.Tower:
-					previewTower = makePreview (gManager.towerPrefab);
+				case Towers.Tower: //TODO This should be removed in the future.
+					previewTower = makeWeaponPreview (gManager.towerPrefab);
 					break;
 				case Towers.LaserTower:
-					previewTower = makePreview (gManager.laserTowerPrefab);
+					previewTower = makeWeaponPreview (gManager.laserTowerPrefab);
 					break;
 				case Towers.CannonTower:
-					previewTower = makePreview (gManager.cannonTowerPrefab);
+					previewTower = makeWeaponPreview (gManager.cannonTowerPrefab);
 					break;
 				case Towers.FireTower:
-					previewTower = makePreview (gManager.fireTowerPrefab);
+					previewTower = makeWeaponPreview (gManager.fireTowerPrefab);
 					break;
 				case Towers.Generator:
 					previewTower = makePreview (gManager.generatorPrefab);
@@ -65,7 +67,7 @@ public class UIManager : MonoBehaviour {
 	}
 	
 	public void TowerButtonClicked(){
-		previewState = Towers.Tower;
+		Debug.Log ("Tower is deprecated now. Please use its children.");
 	}
 	
 	public void LaserTowerButtonClicked(){
@@ -97,14 +99,34 @@ public class UIManager : MonoBehaviour {
 		obj.name = "Preview Model";
 		obj.tag = "Preview";
 
-		var r = obj.AddComponent <Rigidbody>();
+		var r = obj.AddComponent <Rigidbody> ();
 		r.isKinematic = true;
 
-		var rangePreview = Instantiate (rangePreviewPrefab);
-		rangePreview.init (obj.transform,EnergyNode.transmissionRadius,tower.isRedirector);
+		var preview = obj.AddComponent <Preview> ();
 
-		var preview = obj.AddComponent <Preview>();
+		var showRange = prefab is Generator || prefab is PowerRedirector;
+		var energyRange = Instantiate (energyRangePrefab);
+		energyRange.init (obj.transform, EnergyNode.transmissionRadius, tower.isRedirector, showRange);
+		preview.addRange (energyRange);
 
+		return preview;
+	}
+
+	Preview makeWeaponPreview<U> (U prefab) where U: WeaponTower{
+		var preview = makePreview (prefab);
+
+		var attackRange = Instantiate (attackRangePrefab);
+		attackRange.init (preview.transform, prefab.attackingRadius);
+		preview.addRange (attackRange);
+		return preview;
+	}
+
+	Preview makeMinerPreview (Miner prefab){
+		var preview = makePreview (prefab);
+
+		var miningRange = Instantiate (miningRangePrefab);
+		miningRange.init (preview.transform, Miner.workingRadius);
+		preview.addRange (miningRange);
 		return preview;
 	}
 
@@ -139,46 +161,17 @@ public class UIManager : MonoBehaviour {
 				var pos = previewTower.transform.position;
 				var v2 = new Vector2 (pos.x, pos.z);
 
-				hidePreviewTowerWhileDoingThisAction (() => { //must hide the preview, or its layer will become a trouble.
-					switch (previewState) {
-					case Towers.Redirector:
-						gManager.createPowerRedirector (v2);
-						break;
-					case Towers.Miner:
-						gManager.createMiner (v2);
-						break;
-					case Towers.Tower:
-						gManager.createTower (v2);
-						break;
-					case Towers.LaserTower:
-						gManager.createLaserTower (v2);
-						break;
-					case Towers.CannonTower:
-						gManager.createCannonTower (v2);
-						break;
-					case Towers.FireTower:
-						gManager.createFireTower (v2);
-						break;
-					case Towers.Generator:
-						gManager.createGenerator (v2);
-						break;
-					default:
-						throw new UnityException ("Don't know what to create!");
-					}
-				});
-		
+				previewTower.gameObject.SetActive (false);
+
+				gManager.createConstructingTower (v2, previewState, previewTower.copyAModel());
+
+				previewTower.gameObject.SetActive (true);
 			}else{
 				var price = gManager.resourceControl.priceOf (previewState);
 				warning (string.Format ("You need at least {0} ore to place this tower.", price));
 			}
 
 		}
-	}
-
-	void hidePreviewTowerWhileDoingThisAction(Action doSomething){
-		previewTower.gameObject.SetActive (false);
-		doSomething ();
-		previewTower.gameObject.SetActive (true);
 	}
 
 	Coroutine fadeCoroutine;
@@ -221,7 +214,7 @@ public class UIManager : MonoBehaviour {
 public enum Towers{
 	None,
 	Miner,
-	Tower,
+	Tower, //TODO remove this
 	LaserTower,
 	CannonTower,
 	FireTower,

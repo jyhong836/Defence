@@ -28,8 +28,13 @@ public class EnergyPoint : MonoBehaviour {
 	}
 
 	void FixedUpdate () {
-		if (destination.tower.destroyed)
-			destroySelf ();
+		if (destination.tower.destroyed) {
+			var cons = destination.tower as ConstructingTower;
+			if(cons != null){
+				destination = cons.energyNode;
+			}else
+				destroySelf ();
+		}
 		else {
 			var delta = destination.transform.position - transform.position;
 			var disLeft = delta.magnitude;
