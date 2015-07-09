@@ -116,7 +116,7 @@ public class UIManager : MonoBehaviour {
 		var preview = makePreview (prefab);
 
 		var attackRange = Instantiate (attackRangePrefab);
-		attackRange.init (preview.transform, prefab.attackingRadius);
+		attackRange.init (preview.transform, prefab.attackControl.attackingRadius);
 		preview.addRange (attackRange);
 		return preview;
 	}
