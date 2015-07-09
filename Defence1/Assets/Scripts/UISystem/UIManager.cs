@@ -8,9 +8,6 @@ public class UIManager : MonoBehaviour {
 	public GameManager gManager;
 	public Text oreText;
 	public Text warningText;
-	public EnergyRangePreview energyRangePrefab;
-	public AttackingRangePreview attackRangePrefab;
-	public MiningRangePreview miningRangePrefab;
 
 	[SerializeField] float fadeOutTime = 2;
 
@@ -23,28 +20,8 @@ public class UIManager : MonoBehaviour {
 		set{
 			_placementState = value;
 			if(inPreviewModel && previewTower == null){
-				switch(value){
-				case TowerType.Miner:
-					previewTower = Preview.makeMinerPreview (gManager.minerPrefab);
-					break;
-				case TowerType.LaserTower:
-					previewTower = Preview.makeWeaponPreview (gManager.laserTowerPrefab);
-					break;
-				case TowerType.CannonTower:
-					previewTower = Preview.makeWeaponPreview (gManager.cannonTowerPrefab);
-					break;
-				case TowerType.FireTower:
-					previewTower = Preview.makeWeaponPreview (gManager.fireTowerPrefab);
-					break;
-				case TowerType.Generator:
-					previewTower = Preview.makePreview (gManager.generatorPrefab);
-					break;
-				case TowerType.Redirector:
-					previewTower = Preview.makePreview (gManager.redirectorPrefab);
-					break;
-				default:
-					throw new UnityException ("Unknow Preview State.");
-				}
+				var prefab = gManager.getPrefabOfType (value);
+				previewTower = Preview.makePreview (prefab);
 			}
 		}
 	}
@@ -109,16 +86,7 @@ public class UIManager : MonoBehaviour {
 					var price = gManager.resourceControl.priceOf (previewState);
 					warning (string.Format ("You need at least {0} ore to place this tower.", price));
 				}
-
-			} else {
-//				if (previewTower == null) {
-//					Debug.Log ("Preview tower null!");
-//				} else if (!previewTower.valid) {
-//					Debug.Log ("Invalide!");
-//				} else if (EventSystem.current.IsPointerOverGameObject ()) {
-//					Debug.Log ("Event System's fault!");
-//				}
-			}
+			} 
 		}
 	}
 
