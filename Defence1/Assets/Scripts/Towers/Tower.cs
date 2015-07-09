@@ -42,7 +42,7 @@ public abstract class Tower : MonoBehaviour {
 	/// <summary>
 	/// Remember to call this method first in every child's init.
 	/// </summary>
-	protected void initParent(Vector2 pos){
+	void initParent(Vector2 pos){
 		alive = true;
 		this.setPos (pos.x,pos.y);
 		energyNode = gameObject.AddComponent <EnergyNode>();

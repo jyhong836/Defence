@@ -39,8 +39,6 @@ public class Miner : Tower {
 
 
 	public void init(Vector2 pos, Action<int> oreCollected){
-		initParent (pos);
-
 		this.collectCallback = oreCollected;
 		aimControl = 
 			new HorizontalRotationAimingControl (
