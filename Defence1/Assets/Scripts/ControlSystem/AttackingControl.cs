@@ -127,10 +127,10 @@ using System;
 				currentTarget = hpc;
 			}))
 				currentTarget = null;
-		} else if (aimControl.ready) {
+		} else if (aimControl.ready && !detectControl.isOutOfRange(currentTarget,attackingRadius)) {
 			isFiring = true;
 			return attackInterval;
-		} else 
+		} else if (!aimControl.ready)
 			aimControl.updateOrientation (Time.fixedDeltaTime);
 		isFiring = false;
 		return 0;

@@ -107,9 +107,9 @@ public class DetectingControl {
 		HitpointControl currentTarget = null;
 		if (colliders.Length > 0) {
 			// pick nearest one
-			int minIdx = 1;
+			int minIdx = 0;
 			float minDist = (colliders [minIdx].gameObject.getPos () - armPosition()).magnitude;
-			for (int idx = 2; idx < colliders.Length; idx++) {
+			for (int idx = 1; idx < colliders.Length; idx++) {
 				float dist = (colliders [idx].gameObject.getPos () - armPosition()).magnitude;
 				if (dist < minDist) {
 					minDist = dist;
