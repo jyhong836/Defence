@@ -45,6 +45,7 @@ public class Bullet : MonoBehaviour {
 				var enemy = collider.gameObject.GetComponent<Enemy> ();
 //				enemy.lifeLeft -= injury;
 				enemy.hpControl.hp -= injury;
+//				Debug.Log ("hurt enemy"+enemy.hpControl.hp);
 			}
 		}
 

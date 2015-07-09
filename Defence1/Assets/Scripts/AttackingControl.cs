@@ -10,7 +10,8 @@ public enum AttackTargetType {
 [Serializable] public class AttackingControl {
 
 	HitpointControl currentTarget;
-	Vector2 armPosition;
+	Func<Vector2> _armPosition;
+	Vector2 armPosition{get{ return _armPosition();}}
 	AttackTargetType targetType;
 	public int targetMask{ 
 		get{ 
@@ -25,9 +26,9 @@ public enum AttackTargetType {
 		} }
 
 	[SerializeField] public float attackingRadius = 8;
-	[SerializeField] public float injury{ get; private set; }
+	[SerializeField] public float injury;
 	[SerializeField] public float hitForce;
-	[SerializeField] protected float attackInterval = 2;
+	[SerializeField] public float attackInterval = 2;
 
 	private float nextAttackTime;
 
@@ -42,9 +43,9 @@ public enum AttackTargetType {
 	}
 
 	/// <summary>
-	/// _fireCallback (bool fire, HitpointControl currentTarget, float injury)
+	/// _fireCallback (bool fire, HitpointControl currentTarget, Vector3 firePoint, float injury)
 	/// </summary>
-	Action<bool, HitpointControl, float> fireCallback;
+	Action<bool, HitpointControl, Vector3, float> fireCallback;
 	protected bool _isFiring;
 	public bool isFiring{ 
 		get{
@@ -52,7 +53,7 @@ public enum AttackTargetType {
 		} 
 		set{
 			if (value!=_isFiring) {
-				fireCallback (value, currentTarget, injury);
+				fireCallback (value, currentTarget, rotationPart.transform.position, injury);
 			}
 			_isFiring = value;
 		} 
@@ -79,12 +80,12 @@ public enum AttackTargetType {
 	/// You can set this to null for using default.</param>
 	public void init(
 		AttackTargetType targetType,
-		Vector2 armPosition, 
-		Action<bool, HitpointControl, float> fireCallback, 
+		Func<Vector2> armPosition, 
+		Action<bool, HitpointControl, Vector3, float> fireCallback, 
 		Func<float> attackTarget) 
 	{
 		this.targetType = targetType;
-		this.armPosition = armPosition;
+		this._armPosition = armPosition;
 		if (fireCallback == null)
 			this.fireCallback = _fireCallback;
 		else
@@ -100,7 +101,7 @@ public enum AttackTargetType {
 				fireAngle: () => fireAngle,
 				rotateToDirection: RotationMath.RotatePart (rotationPart, 0f),
 				hasTarget: () => currentTarget!=null,
-				targetDirection: () => RotationMath.directionOf (currentTarget.objectPosition - armPosition)
+				targetDirection: () => RotationMath.directionOf (currentTarget.objectPosition - this.armPosition)
 			);
 		nextAttackTime = attackInterval;
 	}
@@ -130,7 +131,7 @@ public enum AttackTargetType {
 		return 0;
 	}
 
-	private void _fireCallback (bool fire, HitpointControl currentTarget, float injury) {
+	private void _fireCallback (bool fire, HitpointControl currentTarget, Vector3 firePoint, float injury) {
 		if (fire)
 			currentTarget.hp -= injury;
 	}
@@ -168,8 +169,8 @@ public enum AttackTargetType {
 	}
 
 	public void DrawAttackLine() {
-		if (currentTarget != null) {
-			var start = Vector3Extension.fromVec2(this.armPosition);
+		if (currentTarget != null && currentTarget.isAlive) {
+			var start = this.rotationPart.position;
 			var end = Vector3Extension.fromVec2(currentTarget.objectPosition);
 			if (aimControl.ready)
 				Debug.DrawLine (start, end, Color.red);

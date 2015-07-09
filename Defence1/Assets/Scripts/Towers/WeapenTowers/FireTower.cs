@@ -9,8 +9,8 @@ public class FireTower : WeaponTower {
 
 	protected override void initAttackingControl() {
 		attackControl.init (AttackTargetType.Enemy, 
-			transform.position.toVec2(), 
-			(fire, currentTarget, injury) => {
+			()=>transform.position.toVec2(), 
+			(fire, currentTarget, firePoint, injury) => {
 				if (fire) {
 					if (!fireSystem.isPlaying) 
 						fireSystem.Play();
@@ -20,22 +20,6 @@ public class FireTower : WeaponTower {
 				}
 			}, AttackTarget);
 	}
-
-//	protected override bool isFiring {
-//		get {return isFiring;} 
-//		set {
-//			if(_isFiring != value){
-//				_isFiring = value;
-//				if (value) {
-//					if (!fireSystem.isPlaying) 
-//						fireSystem.Play();
-//				} else {
-//					if (!fireSystem.isStopped) 
-//						fireSystem.Stop();
-//				}
-//			}
-//		}
-//	}
 
 	float AttackTarget () {
 		var colliders = Physics.OverlapSphere (transform.position, 
@@ -48,16 +32,10 @@ public class FireTower : WeaponTower {
 			}
 			attackControl.isFiring = true;
 
-			return 0;
+			return attackControl.attackInterval;
 		} else {
 			attackControl.isFiring = false;
 			return 0;
 		}
 	}
-//
-//	protected override bool ChangeCurrentTarget () {
-//		isAttacking = true;
-//		isFiring = false;
-//		return true;
-//	}
 }
