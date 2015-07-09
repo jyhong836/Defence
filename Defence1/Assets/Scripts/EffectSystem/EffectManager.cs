@@ -6,12 +6,14 @@ using System.Linq;
 using System;
 
 public class EffectManager : MonoBehaviour {
-	public static Color energyConnectionColor = new Color(52f/255,244f/255,236f/255);
-	public static Color miningConnectionColor = Color.yellow;
+	public Color energyConnectionColor;// = new Color(52f/255,244f/255,236f/255);
+	public Color miningConnectionColor;// = Color.yellow;
+	public Color attackingConnectionColor;// = new Color (1f, 0.4f, 0.5f);
 	public static float connectionWidth = 0.35f;
 
 	public LineRenderer connectionLinePrefab;
 	public GameObject emptyPrefab;
+	public GameObject rangePrefab;
 
 	void Start(){
 		pointOverEffectObject = Instantiate(emptyPrefab);
@@ -30,25 +32,24 @@ public class EffectManager : MonoBehaviour {
 		RaycastHit hitInfo;
 		if(Physics.Raycast (ray, out hitInfo)){
 			var obj = hitInfo.collider.gameObject;
-			if (obj != lastPointOver || obj.tag == "Preview") { //Previews need to be refresh every frame.
+			var preview = obj.GetComponent <Preview> ();
+			if(preview != null){
+				clearPointOverObject ();
+				//Draw preview.
+				var v2 = preview.getPos ();
+				drawRangeOfTower (v2, preview.towerPrefab);
+				drawEnergyConnectionsOfTower (v2, preview.towerPrefab);
+				drawOtherConnectionsOfTower (v2, preview.towerPrefab);
+			} else if (obj != lastPointOver) { 
 				clearPointOverObject ();
 
 				var tower = obj.GetComponent <Tower> ();
 				if (tower != null && tower.alive) {
-					mouseOverTower (tower);
+					var pos = tower.getPos ();
+					drawRangeOfTower (pos, tower);
+					drawEnergyConnectionsOfTower (pos, tower);
+					drawOtherConnectionsOfTower (pos, tower);
 				}
-
-				var energyRangePreview = obj.transform.GetComponentInChildren <EnergyRangePreview> ();
-				if (energyRangePreview != null) {
-					var start = energyRangePreview.transform.position;
-					var isRedirector = energyRangePreview.isRedirector;
-					drawEnergyConnections (start, isRedirector, energyRangePreview.connections());
-				}
-
-				var minningRangePreview = obj.transform.GetComponentInChildren <MiningRangePreview> ();
-				if (minningRangePreview != null)
-					drawMiningConnections (minningRangePreview);
-
 				lastPointOver = obj;
 			}
 		}else{
@@ -64,10 +65,24 @@ public class EffectManager : MonoBehaviour {
 			pointOverEffectObject.name = "Effects";
 		}
 	}
+
+	void drawRange(Vector3 position, float radius, Color color){
+		var r = Instantiate (rangePrefab);
+		r.transform.position = position;
+		r.transform.localScale = 2 * new Vector3 (radius, 0.1f, radius);
+		r.transform.parent = pointOverEffectObject.transform;
+		r.GetComponent <Renderer>().material.color = color;
+	}
 		
-	void drawConnections(Vector3 start, IEnumerable<Vector3> ends, Color connectionColor, ConnectionMode mode, string lineName){
-		foreach(var p in ends){
-			makeLine (start, p, connectionColor, connectionWidth, mode, pointOverEffectObject, lineName);
+	void drawRangeOfTower(Vector2 pos, Tower t){
+		var center = Vector3Extension.fromVec2 (pos);
+		if(t is Generator || t is PowerRedirector){
+			drawRange (center, EnergyNode.transmissionRadius, energyConnectionColor);
+		}else if (t is Miner){
+			drawRange (center, Miner.workingRadius, miningConnectionColor);
+		}else if (t is WeaponTower){
+			var weap = t as WeaponTower;
+			drawRange (center, weap.attackingRadius, attackingConnectionColor);
 		}
 	}
 
@@ -81,62 +96,37 @@ public class EffectManager : MonoBehaviour {
 				mode = ConnectionMode.Send;
 			else
 				mode = ConnectionMode.Receieve;
-			
-			makeLine (start, end, energyConnectionColor, connectionWidth, mode, pointOverEffectObject, "Energy Flow");
+
+			Instantiate (connectionLinePrefab).makeConnection (start, end, 
+				energyConnectionColor, connectionWidth, mode, pointOverEffectObject, "Energy Flow");
 		}
 	}
 
-	void mouseOverTower(Tower tower){
-		var node = tower.energyNode;
-		var start = node.transform.position;
-		drawEnergyConnections (start, tower.isRedirector, node.targetNodes);
-	}
-
-	void drawMiningConnections(MiningRangePreview preview){
-		var start = preview.transform.position;
-		var ends = preview.oresInRange().Select (n => n.transform.position);
-		drawConnections (start,ends, miningConnectionColor, ConnectionMode.Receieve, "Ore Flow");
-	}
-
-	public LineRenderer makeLine(Vector3 start, Vector3 end, Color color,
-		float lineWidth, ConnectionMode mode, GameObject parent, string lineName){
-
-		var render = Instantiate (connectionLinePrefab);
-		render.material.color = color;
-		var lineObj = render.gameObject;
-		lineObj.transform.parent = parent.transform;
-		lineObj.name = lineName;
-
-		var smallWidth = lineWidth / 5;
-		float startWidth, endWidth;
-		switch(mode){
-		case ConnectionMode.Standard:
-			startWidth = lineWidth;
-			endWidth = lineWidth;
-			break;
-		case ConnectionMode.Send:
-			startWidth = lineWidth;
-			endWidth = smallWidth;
-			break;
-		case ConnectionMode.Receieve:
-			startWidth = smallWidth;
-			endWidth = lineWidth;
-			break;
-		default:
-			throw new NotImplementedException ();
+	void drawEnergyConnectionsOfTower(Vector2 pos, Tower t){
+		var start = Vector3Extension.fromVec2 (pos);
+		var connections = new List<EnergyNode> ();
+		var colliders = Physics.OverlapSphere (start, EnergyNode.transmissionRadius);
+		foreach(var c in colliders){
+			var node = c.gameObject.GetComponent<EnergyNode> ();
+			if(node!=null && node.shouldConnectTo (t.isRedirector)){
+				connections.Add (node);
+			}
 		}
-
-		render.SetVertexCount (2);
-		render.SetPosition (0, start);
-		render.SetPosition (1, end);
-		render.SetWidth (startWidth,endWidth);
-
-		return render;
+		drawEnergyConnections (start, t.isRedirector, connections);
 	}
 
-	public enum ConnectionMode{
-		Standard,
-		Send,
-		Receieve
+	void drawOtherConnectionsOfTower(Vector2 pos, Tower t){
+		var start = Vector3Extension.fromVec2 (pos);
+		if (t is Miner) {
+			var colliders = Physics.OverlapSphere (start, Miner.workingRadius);
+			foreach (var c in colliders) {
+				var ore = c.gameObject.GetComponent<Ore> ();
+				if (ore != null) {
+					var line = Instantiate (connectionLinePrefab);
+					line.makeConnection (start, ore.transform.position, miningConnectionColor, 
+						connectionWidth, ConnectionMode.Receieve, pointOverEffectObject, "Ore Flow");
+				}
+			}
+		}
 	}
 }

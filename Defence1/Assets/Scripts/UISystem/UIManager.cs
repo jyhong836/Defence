@@ -25,22 +25,22 @@ public class UIManager : MonoBehaviour {
 			if(inPreviewModel && previewTower == null){
 				switch(value){
 				case TowerType.Miner:
-					previewTower = makeMinerPreview (gManager.minerPrefab);
+					previewTower = Preview.makeMinerPreview (gManager.minerPrefab);
 					break;
 				case TowerType.LaserTower:
-					previewTower = makeWeaponPreview (gManager.laserTowerPrefab);
+					previewTower = Preview.makeWeaponPreview (gManager.laserTowerPrefab);
 					break;
 				case TowerType.CannonTower:
-					previewTower = makeWeaponPreview (gManager.cannonTowerPrefab);
+					previewTower = Preview.makeWeaponPreview (gManager.cannonTowerPrefab);
 					break;
 				case TowerType.FireTower:
-					previewTower = makeWeaponPreview (gManager.fireTowerPrefab);
+					previewTower = Preview.makeWeaponPreview (gManager.fireTowerPrefab);
 					break;
 				case TowerType.Generator:
-					previewTower = makePreview (gManager.generatorPrefab);
+					previewTower = Preview.makePreview (gManager.generatorPrefab);
 					break;
 				case TowerType.Redirector:
-					previewTower = makePreview (gManager.redirectorPrefab);
+					previewTower = Preview.makePreview (gManager.redirectorPrefab);
 					break;
 				default:
 					throw new UnityException ("Unknow Preview State.");
@@ -58,23 +58,7 @@ public class UIManager : MonoBehaviour {
 		handleCancelation ();
 		handleTowerPlacement ();
 	}
-
-	public TowerType towerTypeOfName(string name){
-		if (name == "Redirector")
-			return TowerType.Redirector;
-		else if (name == "Generator")
-			return TowerType.Generator;
-		else if (name == "Miner")
-			return TowerType.Miner;
-		else if (name == "FireTower")
-			return TowerType.FireTower;
-		else if (name == "CannonTower")
-			return TowerType.CannonTower;
-		else if (name == "LaserTower")
-			return TowerType.LaserTower;
-
-		throw new ArgumentException ("No such name exists!");
-	}
+		
 
 	void clearPreviewTower(){
 		if (previewTower != null) {
@@ -86,51 +70,7 @@ public class UIManager : MonoBehaviour {
 	public void towerButtonClicked(string name){
 		inPreviewModel = true;
 		clearPreviewTower ();
-		previewState = towerTypeOfName (name);
-	}
-		
-	Preview makePreview<T> (T prefab) where T: Tower{
-		var obj = Instantiate (prefab.gameObject);
-		var tower = obj.GetComponent<T> ();
-		destroyOptionally (tower);
-		obj.name = "Preview Model";
-		obj.tag = "Preview";
-
-		var r = obj.AddComponent <Rigidbody> ();
-		r.isKinematic = true;
-
-		var preview = obj.AddComponent <Preview> ();
-
-		var showRange = prefab is Generator || prefab is PowerRedirector;
-		var energyRange = Instantiate (energyRangePrefab);
-		energyRange.init (obj.transform, EnergyNode.transmissionRadius, tower.isRedirector, showRange);
-		preview.addRange (energyRange);
-
-		return preview;
-	}
-
-	Preview makeWeaponPreview<U> (U prefab) where U: WeaponTower{
-		var preview = makePreview (prefab);
-
-		var attackRange = Instantiate (attackRangePrefab);
-		attackRange.init (preview.transform, prefab.attackingRadius);
-		preview.addRange (attackRange);
-		return preview;
-	}
-
-	Preview makeMinerPreview (Miner prefab){
-		var preview = makePreview (prefab);
-
-		var miningRange = Instantiate (miningRangePrefab);
-		miningRange.init (preview.transform, Miner.workingRadius);
-		preview.addRange (miningRange);
-		return preview;
-	}
-
-	public static void destroyOptionally(UnityEngine.Object b){
-		if(b!=null){
-			Destroy (b);
-		}
+		previewState = TowerTypeService.towerTypeOfName (name);
 	}
 
 	void handleMousePoint(){
@@ -154,21 +94,31 @@ public class UIManager : MonoBehaviour {
 	}
 
 	void handleTowerPlacement() {
-		if(Input.GetButtonUp ("LeftClick") && previewTower != null && previewTower.valid && !EventSystem.current.IsPointerOverGameObject()) {
-			if (gManager.resourceControl.tryCostOre (previewState)) {
-				var pos = previewTower.transform.position;
-				var v2 = new Vector2 (pos.x, pos.z);
+		if (Input.GetButtonUp ("LeftClick")) {
+			if (previewTower != null && previewTower.valid && !EventSystem.current.IsPointerOverGameObject ()) {
+				if (gManager.resourceControl.tryCostOre (previewState)) {
+					var pos = previewTower.transform.position;
+					var v2 = new Vector2 (pos.x, pos.z);
 
-				previewTower.gameObject.SetActive (false);
+					previewTower.gameObject.SetActive (false);
 
-				gManager.createConstructingTower (v2, previewState, previewTower.copyAModel());
+					gManager.createConstructingTower (v2, previewState, previewTower.copyAModel ());
 
-				previewTower.gameObject.SetActive (true);
-			}else{
-				var price = gManager.resourceControl.priceOf (previewState);
-				warning (string.Format ("You need at least {0} ore to place this tower.", price));
+					previewTower.gameObject.SetActive (true);
+				} else {
+					var price = gManager.resourceControl.priceOf (previewState);
+					warning (string.Format ("You need at least {0} ore to place this tower.", price));
+				}
+
+			} else {
+//				if (previewTower == null) {
+//					Debug.Log ("Preview tower null!");
+//				} else if (!previewTower.valid) {
+//					Debug.Log ("Invalide!");
+//				} else if (EventSystem.current.IsPointerOverGameObject ()) {
+//					Debug.Log ("Event System's fault!");
+//				}
 			}
-
 		}
 	}
 
@@ -189,7 +139,6 @@ public class UIManager : MonoBehaviour {
 			yield return null;
 			timePast += Time.deltaTime;
 		}
-	
 	}
 
 	static UIManager singleton;
@@ -205,15 +154,5 @@ public class UIManager : MonoBehaviour {
 			}
 		}
 	}
-		
 }
 
-
-public enum TowerType{
-	Miner,
-	LaserTower,
-	CannonTower,
-	FireTower,
-	Generator,
-	Redirector
-}
