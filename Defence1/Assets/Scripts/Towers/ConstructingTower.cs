@@ -20,6 +20,10 @@ public class ConstructingTower : Tower {
 		changeColorAccordingEnergy ();
 	}
 
+	protected override void initHpControl (){
+		hpControl = new HitpointControl ();
+		base.initHpControl();
+	}
 
 	public override float maxPower () {
 		return constructionPower;
