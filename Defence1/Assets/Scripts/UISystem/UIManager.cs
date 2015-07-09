@@ -15,23 +15,14 @@ public class UIManager : MonoBehaviour {
 	[SerializeField] float fadeOutTime = 2;
 
 	Preview previewTower;
-	bool _inPreviewModel = false;
-	public bool inPreviewModel {
-		get {return _inPreviewModel;}
-		set {
-			if(value != _inPreviewModel){
-				_inPreviewModel = value;
-				if(!value)
-					Destroy (previewTower.gameObject);
-			}
-		}
-	}
+
+	public bool inPreviewModel {get; private set;}
 	[SerializeField] TowerType _placementState;
 	public TowerType previewState{
 		get{ return _placementState;}
 		set{
-			if(value != _placementState){
-				_placementState = value;
+			_placementState = value;
+			if(inPreviewModel && previewTower == null){
 				switch(value){
 				case TowerType.Miner:
 					previewTower = makeMinerPreview (gManager.minerPrefab);
@@ -85,9 +76,16 @@ public class UIManager : MonoBehaviour {
 		throw new ArgumentException ("No such name exists!");
 	}
 
+	void clearPreviewTower(){
+		if (previewTower != null) {
+			Destroy (previewTower.gameObject);
+			previewTower = null;
+		}
+	}
+
 	public void towerButtonClicked(string name){
-		inPreviewModel = false;
 		inPreviewModel = true;
+		clearPreviewTower ();
 		previewState = towerTypeOfName (name);
 	}
 		
@@ -151,6 +149,7 @@ public class UIManager : MonoBehaviour {
 	void handleCancelation(){
 		if(Input.GetButtonDown ("Cancel")){
 			inPreviewModel = false;
+			clearPreviewTower ();
 		}
 	}
 
