@@ -8,7 +8,7 @@ public class Generator : Tower {
 
 	float outputTimer = 0;
 	
-	public override void init(Vector2 pos){
+	public void init(Vector2 pos){
 		initParent (pos);
 
 	}

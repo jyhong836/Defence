@@ -36,6 +36,7 @@ public class Preview : MonoBehaviour {
 	void OnTriggerEnter(Collider other) {
 		collisionNum += 1;	
 	}
+		
 
 	void OnTriggerExit(Collider other) {
 		collisionNum -= 1;

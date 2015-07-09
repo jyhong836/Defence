@@ -26,8 +26,8 @@ public enum AttackTargetType {
 		} }
 
 	[SerializeField] public float attackingRadius = 8;
-	[SerializeField] public float injury = 10;
-	[SerializeField] public float hitForce = 1;
+	[SerializeField] public float injury;
+	[SerializeField] public float hitForce;
 	[SerializeField] public float attackInterval = 2;
 
 	private float nextAttackTime;
@@ -66,7 +66,7 @@ public enum AttackTargetType {
 	Func<float> attackTarget; 
 
 	protected AimingControl aimControl;
-	public Transform rotationPart;
+	[SerializeField] private Transform rotationPart;
 	[SerializeField] private float rotateSpeed = 3;
 	[SerializeField] private float fireAngle = 0.01f;
 
@@ -78,8 +78,7 @@ public enum AttackTargetType {
 	/// currentTarget, float injury). You can set this to null for using default.</param>
 	/// <param name="attackTarget">Attack target. Should return next time interval 
 	/// You can set this to null for using default.</param>
-	public AttackingControl(
-		HorizontalRotationAimingControl aimControl,
+	public void init(
 		AttackTargetType targetType,
 		Func<Vector2> armPosition, 
 		Action<bool, HitpointControl, Vector3, float> fireCallback, 
@@ -96,8 +95,14 @@ public enum AttackTargetType {
 		else
 			this.attackTarget = attackTarget;
 
-		this.aimControl = aimControl;
-			
+		aimControl = 
+			new HorizontalRotationAimingControl (
+				rotateSpeed: () => rotateSpeed,
+				fireAngle: () => fireAngle,
+				rotateToDirection: RotationMath.RotatePart (rotationPart, 0f),
+				hasTarget: () => currentTarget!=null,
+				targetDirection: () => RotationMath.directionOf (currentTarget.objectPosition - this.armPosition)
+			);
 		nextAttackTime = attackInterval;
 	}
 
@@ -172,10 +177,6 @@ public enum AttackTargetType {
 			else
 				Debug.DrawLine (start, end, Color.green);
 		}
-	}
-
-	public static void setupAttackingControlFor(WeaponTower t){
-		t.attackControl.attackingRadius = 15;
 	}
 }
 

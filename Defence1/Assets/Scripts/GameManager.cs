@@ -32,6 +32,7 @@ public class GameManager : MonoBehaviour {
 	public Generator generatorPrefab;
 	public PowerRedirector redirectorPrefab;
 	public EnergyPoint energyPointPrefab;
+	public ConstructingTower constructingTowerPrefab;
 	//Prefabs----------------
 
 	public bool shouldGenerateMap = true;
@@ -165,8 +166,7 @@ public class GameManager : MonoBehaviour {
 	public ConstructingTower createConstructingTower(Vector2 pos, TowerType towerType, GameObject model){
 		model.transform.parent = towerParent.transform;
 		var t = model.AddComponent<ConstructingTower> ();
-		var maxHp = 200f; //TODO need to be improved.
-		t.init (pos, maxHp, ConstructingTower.powerNeedToConstruct (towerType),
+		t.init (pos, ConstructingTower.powerNeedToConstruct (towerType),
 			createTower: () => createTowerOfType (pos, towerType));
 
 		return t;

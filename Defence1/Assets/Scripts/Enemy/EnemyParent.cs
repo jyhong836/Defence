@@ -17,7 +17,7 @@ public class EnemyParent : MonoBehaviour {
 	public void initParent(Vector2 pos) {
 		alive = true;
 		this.setPos (pos.x,pos.y);
-		hpControl = HitpointControl.createFor (this);
+		hpControl.init ((value) => destroySelf (), (value) => {}, ()=>transform.position.toVec2());
 	}
 
 	public bool destroyed { get{ return !alive;}}

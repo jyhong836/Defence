@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 
 public abstract class Tower : MonoBehaviour {
 
-	public HitpointControl hpControl { get; private set;}
+	public HitpointControl hpControl;
 
 	public bool destroyed { get{ return !alive;}}
 	public bool alive { get; private set;}
@@ -30,8 +30,6 @@ public abstract class Tower : MonoBehaviour {
 		destroySelf (GameManager.Get);
 	}
 
-	public abstract void init (Vector2 pos);
-
 	protected virtual void cleanUp(GameManager manager) {} 
 
 	/// <summary>
@@ -43,7 +41,7 @@ public abstract class Tower : MonoBehaviour {
 		energyNode = gameObject.AddComponent <EnergyNode>();
 		energyNode.init (energyArrive,this);
 
-		hpControl = HitpointControl.createFor (this);
+		hpControl.init((v) => destroySelf (), (v)=>{}, ()=>transform.position.toVec2());
 	}
 
 	/// <summary>
