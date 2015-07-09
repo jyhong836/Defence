@@ -37,7 +37,7 @@ public class Miner : Tower {
 	Action<int> collectCallback;
 	AimingControl aimControl;
 
-
+	// FIXME this init is defferent for parent's, will cause miner not inited
 	public void init(Vector2 pos, Action<int> oreCollected){
 		this.collectCallback = oreCollected;
 		aimControl = 
