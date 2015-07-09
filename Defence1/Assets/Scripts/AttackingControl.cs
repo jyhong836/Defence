@@ -155,17 +155,18 @@ public enum AttackTargetType {
 				break;
 			case AttackTargetType.Tower:
 				var tower = colliders [index].gameObject.GetComponent<Tower> ();
-				currentTarget = tower.hpControl;
+				if (tower.alive)
+					currentTarget = tower.hpControl;
+				else
+					currentTarget = null;
 				break;
 			default:
 				throw new UnityException ("Unknown mask: "+targetMask);
 			}
-
-			return true;
 		} else {
 			currentTarget = null;
-			return false;
 		}
+		return currentTarget != null;
 	}
 
 	public void DrawAttackLine() {

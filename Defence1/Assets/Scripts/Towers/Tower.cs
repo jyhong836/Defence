@@ -41,7 +41,7 @@ public abstract class Tower : MonoBehaviour {
 		energyNode = gameObject.AddComponent <EnergyNode>();
 		energyNode.init (energyArrive,this);
 
-		hpControl.init((v) => destroySelf (), (v)=>{}, ()=>transform.position.toVec2());
+		hpControl.init((v) => destroySelf (), (v)=>{}, ()=>this.transform.position.toVec2());
 	}
 
 	/// <summary>
