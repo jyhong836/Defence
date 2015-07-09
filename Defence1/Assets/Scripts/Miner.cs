@@ -37,6 +37,9 @@ public class Miner : Tower {
 	Action<int> collectCallback;
 	AimingControl aimControl;
 
+	public override void init(Vector2 pos){
+		init (pos, ore=>GameManager.Get.resourceControl.tryChangeOre (ore));
+	}
 
 	public void init(Vector2 pos, Action<int> oreCollected){
 		initParent (pos);

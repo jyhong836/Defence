@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public enum TowerMode {
 	Attack, // auto resume from powerless
@@ -13,18 +14,7 @@ public class WeaponTower : Tower {
 	protected bool isAttacking = false;
 
 	public AttackingControl attackControl;
-
-//	protected bool _isFiring;
-//	protected virtual bool isFiring{ get{
-//			return _isFiring;
-//		} 
-//		set{
-//			_isFiring = value;
-//			if (value) {
-//				
-//			}
-//		} 
-//	}
+	public Transform rotationPart;
 
 	[SerializeField] protected float idlePowerUsage = 0.001f; // per sec
 	[SerializeField] protected float attackPowerUsage = 0.01f; // per sec
@@ -61,14 +51,19 @@ public class WeaponTower : Tower {
 				isOutOfPower = true;
 		}
 	}
-	
-	public void init(Vector2 pos){
-		initParent (pos);
-		initAttackingControl ();
-	}
 
-	protected virtual void initAttackingControl() {
-		attackControl.init (AttackTargetType.Enemy, ()=>transform.position.toVec2(), null, null);
+	protected virtual Action<bool, HitpointControl, Vector3, float> fireCallback{
+		get{return null;}
+	}
+	
+	public override void init(Vector2 pos){
+		initParent (pos);
+		attackControl = initAttackingControl ();
+		attackControl.rotationPart = rotationPart;
+		AttackingControl.setupAttackingControlFor (this);
+	}
+	protected virtual AttackingControl initAttackingControl() {
+		return new AttackingControl (AttackTargetType.Enemy, ()=>transform.position.toVec2(), fireCallback, null);
 	}
 
 	void FixedUpdate () {
@@ -88,7 +83,6 @@ public class WeaponTower : Tower {
 			}
 		}
 	}
-
 	// Use this for initialization
 	void Start () {
 		isAttacking = true; // FIXME attack start at begining
@@ -103,60 +97,6 @@ public class WeaponTower : Tower {
 		}
 	}
 
-//	void StartAttack () {
-//		if (currentTarget!=null)
-//			isAttacking = true;
-//		else {
-//			ChangeCurrentTarget();
-//		}
-//	}
-
-//	// control the attack time
-//	protected void Attack () {
-//		if (nextAttackTime <= 0) {
-//			nextAttackTime += AttackTarget();
-//		} else {
-//			nextAttackTime -= Time.fixedDeltaTime;
-//			isFiring = false;
-//		}
-//	}
-
-//	/// <summary>
-//	/// Attacks the target.
-//	/// </summary>
-//	/// <returns>Time interval.</returns>
-//	protected virtual float AttackTarget () {
-//		if (currentTarget == null || currentTarget.hpControl.hp <= 0 || isTargetOutOfRange) {
-//			ChangeCurrentTarget ();
-//		} else if (aimControl.ready) {
-//			isFiring = true;
-//			return attackInterval;
-//		} else 
-//			aimControl.updateOrientation (Time.fixedDeltaTime);
-//		isFiring = false;
-//		return 0;
-//	}
-
-//	/// <summary>
-//	/// Changes the current target to a new enemy.
-//	/// </summary>
-//	/// <returns>Time for rotate to new target or 0.</returns>
-//	protected virtual bool ChangeCurrentTarget () {
-//		var colliders = Physics.OverlapSphere (transform.position,attackingRadius,Masks.Enemy);
-//		if (colliders.Length > 0) {
-//			//random pick one
-//			var index = UnityEngine.Random.Range (0, colliders.Length);
-//			var enemy = colliders [index].gameObject.GetComponent <Enemy>();
-//			currentTarget = enemy;
-////			isAttacking = true;
-//
-//			return true;
-//		} else {
-//			currentTarget = null;
-////			isAttacking = false;
-//			return false;
-//		}
-//	}
 
 	#region implemented abstract members of TowerParent
 	public override float maxPower ()

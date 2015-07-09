@@ -7,8 +7,8 @@ using System.Collections;
 public class FireTower : WeaponTower {
 	public ParticleSystem fireSystem;
 
-	protected override void initAttackingControl() {
-		attackControl.init (AttackTargetType.Enemy, 
+	protected override AttackingControl initAttackingControl() {
+		return new AttackingControl (AttackTargetType.Enemy, 
 			()=>transform.position.toVec2(), 
 			(fire, currentTarget, firePoint, injury) => {
 				if (fire) {

@@ -11,7 +11,7 @@ public class PowerRedirector : Tower {
 		return amount; // Redirector doesn't consume power.
 	}
 
-	public void init(Vector2 pos){
+	public override void init(Vector2 pos){
 		initParent (pos);
 	}
 

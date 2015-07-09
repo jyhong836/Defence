@@ -6,8 +6,8 @@ public class CannonTower : WeaponTower {
 	public float bulletSpeed;
 	public float bulletAttackingRadius;
 
-	protected override void initAttackingControl() {
-		attackControl.init (AttackTargetType.Enemy,
+	protected override AttackingControl initAttackingControl() {
+		return new AttackingControl (AttackTargetType.Enemy,
 			()=>transform.position.toVec2(), 
 			(fire, currentTarget, firePoint, injury) => {
 				if (fire) {

@@ -10,29 +10,39 @@ public class ConstructingTower : Tower {
 
 	Renderer render;
 
-	public void init(Vector2 pos ,float powerNeed, Func<Tower> createTower){
+	public void init(Vector2 pos ,float powerNeed, float maxHp, Func<Tower> createTower){
 		initParent (pos);
 
 		render = GetComponent <Renderer>();
 		this.constructionPower = powerNeed;
 		this.createTower = createTower;
+		hpControl.maxHitpoint = maxHp;
 		powerLeft = 0; //This is needed.
 		changeColorAccordingEnergy ();
 	}
 
+	public override void init(Vector2 pos){
+		throw new NotSupportedException ("ConstructingTower shouldn't be created in this way!");
+	}
 
 	public override float maxPower () {
 		return constructionPower;
 	}
 
-	void changeColorAccordingEnergy(){
+	void changeColorAccordingEnergy() {
 		var ratio = powerLeft / maxPower ();
 		render.material.color = Color.Lerp (EnergyPoint.lowColor, EnergyPoint.highColor, ratio);
+	}
+
+	void changeHpAccordingEnergy() {
+		var ratio = powerLeft / maxPower ();
+		hpControl.hp = hpControl.maxHitpoint * ratio;
 	}
 
 	protected override float energyArrive (float amount){
 		var energyReturned = base.energyArrive (amount);
 		changeColorAccordingEnergy ();
+		changeHpAccordingEnergy ();
 
 		if(energyReturned > 1e-4f){
 			energyFulled ();
