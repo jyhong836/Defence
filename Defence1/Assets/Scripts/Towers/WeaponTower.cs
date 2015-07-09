@@ -54,7 +54,7 @@ public class WeaponTower : Tower {
 	}
 
 	protected virtual void initAttackingControl() {
-		attackControl.init (AttackTargetType.Enemy, ()=>transform.position.toVec2(), null, null);
+		attackControl.init (TargetType.Enemy, ()=>transform.position.toVec2(), null, null);
 	}
 
 	void FixedUpdate () {
