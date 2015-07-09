@@ -4,6 +4,8 @@ using UnityEngine.EventSystems;
 
 public abstract class Tower : MonoBehaviour {
 
+	public HitpointControl hpControl;
+
 	public bool destroyed { get{ return !alive;}}
 	public bool alive { get; private set;}
 	public EnergyNode energyNode { get; private set;} //The embeded enrgyNode for every building.
@@ -38,6 +40,8 @@ public abstract class Tower : MonoBehaviour {
 		this.setPos (pos.x,pos.y);
 		energyNode = gameObject.AddComponent <EnergyNode>();
 		energyNode.init (energyArrive,this);
+
+		hpControl.init((v) => destroySelf (), (v)=>{}, ()=>transform.position.toVec2());
 	}
 
 	/// <summary>
