@@ -31,7 +31,7 @@ public class EnergyPoint : MonoBehaviour {
 		if (destination.tower.destroyed) {
 			var cons = destination.tower as ConstructingTower;
 			if(cons != null){
-				destination = cons.energyNode;
+				destination = cons.successor.energyNode;
 			}else
 				destroySelf ();
 		}
