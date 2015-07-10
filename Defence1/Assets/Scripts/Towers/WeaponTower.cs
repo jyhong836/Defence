@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public enum TowerMode {
 	Attack, // auto resume from powerless
@@ -13,6 +14,7 @@ public class WeaponTower : Tower {
 
 	public AttackingControl attackControl;
 	public DetectingControl<Enemy> detectControl;
+	public AimingControl aimControl;
 	public float detectingRadius = 10;
 
 	[SerializeField] protected float idlePowerUsage = 0.001f; // per sec
@@ -50,20 +52,49 @@ public class WeaponTower : Tower {
 				isOutOfPower = true;
 		}
 	}
+
+	[SerializeField] public Transform rotationPart;
+	[SerializeField] protected float rotateSpeed = 3;
+	[SerializeField] protected float fireAngle = 0.01f;
 	
 	protected override void init(Vector2 pos){
-		initAttackingControl ();
 		detectControl = new DetectingControl<Enemy>(TargetType.Enemy,(o)=>o.hpControl,
 			()=>transform.position.toVec2(),
 			detectingRadius
 		);
+		aimControl = 
+			new HorizontalRotationAimingControl (
+				rotateSpeed: () => rotateSpeed,
+				fireAngle: () => fireAngle,
+				rotateToDirection: RotationMath.RotatePart (rotationPart, 0f),
+				hasTarget: () => attackControl.currentTarget!=null,
+				targetDirection: () => RotationMath.directionOf (attackControl.currentTarget.objectPosition - 
+					transform.position.toVec2())
+			);
+		initAttackingControl ();
 	}
 
 	protected virtual void initAttackingControl() {
 		attackControl.init (TargetType.Enemy, ()=>transform.position.toVec2(), null, null,
 			()=>detectControl.isOutOfRange(attackControl.currentTarget),
 			()=>detectControl.isOutOfRange(attackControl.currentTarget, attackControl.attackingRadius),
-			(detectedCallback)=>detectControl.DetectSingleNearest(detectedCallback)
+			(detectedCallback)=>detectControl.DetectSingleNearest(detectedCallback),
+			()=>aimControl.ready,
+			aimControl.updateOrientation
+		);
+	}
+
+	protected void initAttackingControl(
+		Action<bool> fireEffect,
+		Action<HitpointControl, float> attackAction
+	) {
+		attackControl.init (TargetType.Enemy, ()=>transform.position.toVec2(), 
+			fireEffect, attackAction,
+			()=>detectControl.isOutOfRange(attackControl.currentTarget),
+			()=>detectControl.isOutOfRange(attackControl.currentTarget, attackControl.attackingRadius),
+			(detectedCallback)=>detectControl.DetectSingleNearest(detectedCallback),
+			()=>aimControl.ready,
+			aimControl.updateOrientation
 		);
 	}
 
@@ -73,7 +104,6 @@ public class WeaponTower : Tower {
 				isAttacking = false;
 			} else {
 				powerLeft -= attackPowerUsage*Time.fixedDeltaTime;
-//				Attack();
 				attackControl.Attack();
 			}
 		} else if (!isOutOfPower) {
@@ -88,8 +118,6 @@ public class WeaponTower : Tower {
 	// Use this for initialization
 	void Start () {
 		isAttacking = true; // FIXME attack start at begining
-//		ChangeCurrentTarget ();
-//		
 	}
 	
 	// Update is called once per frame

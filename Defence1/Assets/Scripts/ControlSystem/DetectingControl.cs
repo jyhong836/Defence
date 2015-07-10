@@ -128,23 +128,5 @@ public class DetectingControl<T> {
 		}
 		return false;
 	}
-
-//	private HitpointControl getTarget(GameObject obj) {
-//		switch (targetType) {
-//		case TargetType.Enemy: 
-//			var enemy = obj.GetComponent<Enemy> ();
-//			if (enemy.alive)
-//				return enemy.hpControl;
-//			break;
-//		case TargetType.Tower:
-//			var tower = obj.GetComponent<Tower> ();
-//			if (tower.alive)
-//				return tower.hpControl;
-//			break;
-//		default:
-//			throw new UnityException ("Unknown mask: "+targetMask);
-//		}
-//		return null;
-//	}
 	
 }

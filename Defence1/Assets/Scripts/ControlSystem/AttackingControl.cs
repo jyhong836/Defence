@@ -2,28 +2,10 @@
 using System.Collections;
 using System;
 
-//public enum AttackTargetType {
-//	Enemy,
-//	Tower
-//}
-
 [Serializable] public class AttackingControl {
 
 	public HitpointControl currentTarget;
-//	DetectingControl<> detectControl;
 	Func<Vector2> armPosition;
-//	TargetType targetType;
-//	public int targetMask{ 
-//		get{ 
-//			switch (targetType) {
-//			case TargetType.Enemy:
-//				return Masks.Enemy;
-//			case AttackTargetType.Tower:
-//				return Masks.Tower;
-//			default:
-//				throw new UnityException ("Unknown targetType");
-//			}
-//		} }
 
 	[SerializeField] public float attackingRadius = 8;
 	[SerializeField] public float injury;
@@ -32,19 +14,10 @@ using System;
 
 	private float nextAttackTime;
 
-//	protected bool isTargetOutOfRange {
-//		get {
-//			return detectControl.isOutOfRange(currentTarget); // FIXME should use the attackRadus here?
-//		}
-//	}
 	private Func<bool> isTargetOutOfDetecting;
 	private Func<bool> isTargetOutOfAttacking;
 	Func<Action<HitpointControl>, bool> detectTarget;
 
-	/// <summary>
-	/// _fireCallback (bool fire, HitpointControl currentTarget, Vector3 firePoint, float injury)
-	/// </summary>
-//	Action<bool, HitpointControl, Vector3, float> fireCallback;
 	protected bool _isFiring;
 	public bool isFiring{ 
 		get{
@@ -61,16 +34,9 @@ using System;
 		} 
 	}
 
-	/// <summary>
-	/// float _attackTarget ()
-	/// return next time interval
-	/// </summary>
-//	Func<float> attackTarget; 
-
-	protected AimingControl aimControl;
-	[SerializeField] public Transform rotationPart;
-	[SerializeField] private float rotateSpeed = 3;
-	[SerializeField] private float fireAngle = 0.01f;
+//	protected AimingControl aimControl;
+	public Func<bool> isAimedAtTarget;
+	private Action<float> updateOrientation;
 
 	/// <summary>
 	/// Init the specified armPosition, fireCallback and attackTarget.
@@ -83,12 +49,13 @@ using System;
 	public void init(
 		TargetType targetType,
 		Func<Vector2> armPosition, 
-//		Action<bool, HitpointControl, Vector3, float> fireCallback,
 		Action<bool> fireEffect,
 		Action<HitpointControl, float> attackAction, 
 		Func<bool> isTargetOutOfDetecting,
 		Func<bool> isTargetOutOfAttacking,
-		Func<Action<HitpointControl>, bool> detectTarget
+		Func<Action<HitpointControl>, bool> detectTarget,
+		Func<bool> isAimedAtTarget,
+		Action<float> updateOrientation
 	) 
 	{
 //		this.targetType = targetType;
@@ -105,26 +72,14 @@ using System;
 			this.attackAction = (HitpointControl target,float injury)=>{target.hp -= injury;};
 		else
 			this.attackAction = attackAction;
-
-		aimControl = 
-			new HorizontalRotationAimingControl (
-				rotateSpeed: () => rotateSpeed,
-				fireAngle: () => fireAngle,
-				rotateToDirection: RotationMath.RotatePart (rotationPart, 0f),
-				hasTarget: () => currentTarget!=null,
-				targetDirection: () => RotationMath.directionOf (currentTarget.objectPosition - this.armPosition())
-			);
+		
+		this.isAimedAtTarget = isAimedAtTarget;
+		this.updateOrientation = updateOrientation;
 		nextAttackTime = attackInterval;
 
 		this.isTargetOutOfAttacking = isTargetOutOfAttacking;
 		this.isTargetOutOfDetecting = isTargetOutOfDetecting;
 		this.detectTarget = detectTarget;
-//		this.detectControl = detecControl;
-
-//		detectControl = new DetectingControl<Enemy> (targetType,
-//			( t)=>t.hpControl,
-//			armPosition, 
-//			detectingRadius);
 	}
 
 	public void Attack () {
@@ -142,67 +97,30 @@ using System;
 	/// <returns>Time interval.</returns>
 	private float attackTarget () {
 		if (currentTarget == null || currentTarget.hp <= 0 || isTargetOutOfDetecting()) {
-//			ChangeCurrentTarget ();
 			if (!detectTarget ((HitpointControl hpc) => {currentTarget = hpc;}))
 				currentTarget = null;
-		} else if (aimControl.ready && !isTargetOutOfAttacking()) {
+		} else if (isAimedAtTarget() && !isTargetOutOfAttacking()) {
 			isFiring = true;
 			return attackInterval;
-		} else if (!aimControl.ready)
-			aimControl.updateOrientation (Time.fixedDeltaTime);
+		} else if (!isAimedAtTarget())
+			updateOrientation (Time.fixedDeltaTime);
 		isFiring = false;
 		return 0;
 	}
 
-//	private void _fireCallback (bool fire, HitpointControl currentTarget, Vector3 firePoint, float injury) {
-//		if (fire)
-//			attackAction(currentTarget, injury);
-//		fireEffect (fire);
-//	}
-
 	private Action<HitpointControl, float> attackAction;
 	private Action<bool> fireEffect;
 
-//	/// <summary>
-//	/// Changes the current target to a new enemy.
-//	/// </summary>
-//	/// <returns>Time for rotate to new target or 0.</returns>
-//	private bool ChangeCurrentTarget () {
-//		var colliders = Physics.OverlapSphere (
-//			Vector3Extension.fromVec2(armPosition()),
-//			attackingRadius,
-//			targetMask);
-//		if (colliders.Length > 0) {
-//			//random pick one
-//			var index = UnityEngine.Random.Range (0, colliders.Length);
-//			switch (targetType) {
-//			case AttackTargetType.Enemy: 
-//				var enemy = colliders [index].gameObject.GetComponent<Enemy> ();
-//				currentTarget = enemy.hpControl;
-//				break;
-//			case AttackTargetType.Tower:
-//				var tower = colliders [index].gameObject.GetComponent<Tower> ();
-//				if (tower.alive)
-//					currentTarget = tower.hpControl;
-//				else
-//					currentTarget = null;
-//				break;
-//			default:
-//				throw new UnityException ("Unknown mask: "+targetMask);
-//			}
-//		} else {
-//			currentTarget = null;
-//		}
-//		return currentTarget != null;
-//	}
-
 	public void DrawAttackLine() {
 		if (currentTarget != null && currentTarget.isAlive) {
-			var start = this.rotationPart.position;
+			var start = Vector3Extension.fromVec2(this.armPosition());
 			var end = Vector3Extension.fromVec2(currentTarget.objectPosition);
-			if (aimControl.ready)
-				Debug.DrawLine (start, end, Color.red);
-			else
+			if (isAimedAtTarget()) {
+				if (isFiring)
+					Debug.DrawLine (start, end, Color.red);
+				else 
+					Debug.DrawLine (start, end, Color.yellow);
+			} else
 				Debug.DrawLine (start, end, Color.green);
 		}
 	}
