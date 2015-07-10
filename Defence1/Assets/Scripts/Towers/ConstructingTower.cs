@@ -11,6 +11,7 @@ public class ConstructingTower : Tower {
 	Renderer render;
 
 	public void init(Vector2 pos ,float powerNeed, Func<Tower> createTower){
+		create (pos);
 		render = GetComponent <Renderer>();
 		this.constructionPower = powerNeed;
 		this.createTower = createTower;

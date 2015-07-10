@@ -38,8 +38,8 @@ public class Miner : Tower {
 	AimingControl aimControl;
 
 
-	public void init(Vector2 pos, Action<int> oreCollected){
-		this.collectCallback = oreCollected;
+	protected override void init(Vector2 pos){
+		this.collectCallback = change => GameManager.Get.resourceControl.tryChangeOre (change);
 		aimControl = 
 			new HorizontalRotationAimingControl (
 			rotateSpeed: () => 1f,
@@ -57,7 +57,7 @@ public class Miner : Tower {
 	// Game Mechanisms should be included into FixedUpdate.
 	void FixedUpdate () {
 		if(! finishedWorking){
-			if(currentTarget.oreLeft >0 ) 
+			if(currentTarget.oreLeft > 0 && targetInRange() ) 
 				collectFromTarget ();
 			else 
 				changeCurrentTarget ();
@@ -71,6 +71,11 @@ public class Miner : Tower {
 
 			Debug.DrawLine (start,end,Color.yellow);
 		}
+	}
+
+	bool targetInRange(){
+		var laserLength = (currentTarget.getPos () - this.getPos ()).magnitude - currentTarget.radius;
+		return laserLength < workingRadius;
 	}
 
 	void collectFromTarget(){
