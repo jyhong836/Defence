@@ -17,7 +17,7 @@ public class Preview : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		valid = collisionNum == 0;
+		valid = collisionNum == 0; //This also prevent tower placement when cliking button to switch.
 	}
 
 	private int collisionNum = 0;

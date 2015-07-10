@@ -6,7 +6,7 @@ public class Ore : MonoBehaviour {
 	[SerializeField] float ore;
 	public float radius;
 
-	public static readonly float radiusFactor = 0.5f;
+	public static readonly float radiusFactor = 0.25f;
 	
 	public float oreLeft{
 		get{ return ore; }
@@ -37,7 +37,7 @@ public class Ore : MonoBehaviour {
 
 	void ajustRadiusAccordingToOre(){
 		radius = radiusOfAmount (ore);
-		transform.localScale = Vector3Extension.vectorOf(radius);
+		transform.localScale = Vector3Extension.vectorOf(2*radius);
 	}
 
 	public static float radiusOfAmount(float amount){

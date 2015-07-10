@@ -3,6 +3,7 @@ using System.Collections;
 
 public class EnemyManager : MonoBehaviour, IEnemySpawner {
 
+	public bool spawningEnemy = true;
 	public GameManager gameManager;
 	public Enemy enemyPrefab;
 
@@ -18,7 +19,8 @@ public class EnemyManager : MonoBehaviour, IEnemySpawner {
 	}
 
 	void FixedUpdate() {
-		method.timePassed (Time.fixedDeltaTime);
+		if(spawningEnemy)
+			method.timePassed (Time.fixedDeltaTime);
 	}
 
 	Enemy createEnemy(Vector2 pos) {

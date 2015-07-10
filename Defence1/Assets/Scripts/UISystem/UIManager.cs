@@ -72,7 +72,7 @@ public class UIManager : MonoBehaviour {
 
 	void handleTowerPlacement() {
 		if (Input.GetButtonUp ("LeftClick")) {
-			if (previewTower != null && previewTower.valid && !EventSystem.current.IsPointerOverGameObject ()) {
+			if (previewTower != null && previewTower.valid && !TowerButton.mouseOnButton) {
 				if (gManager.resourceControl.tryCostOre (previewState)) {
 					var pos = previewTower.transform.position;
 					var v2 = new Vector2 (pos.x, pos.z);
@@ -86,7 +86,7 @@ public class UIManager : MonoBehaviour {
 					var price = gManager.resourceControl.priceOf (previewState);
 					warning (string.Format ("You need at least {0} ore to place this tower.", price));
 				}
-			} 
+			}
 		}
 	}
 
