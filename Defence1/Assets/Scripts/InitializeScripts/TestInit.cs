@@ -7,7 +7,7 @@ public class TestInit : InitializeScript {
 		manager.createTowerOfType (Vector2.zero, TowerType.Generator);
 		manager.createTowerOfType (new Vector2(6,0), TowerType.Redirector);
 		manager.createTowerOfType (new Vector2(-6,0), TowerType.Redirector);
-		manager.createTowerOfType (new Vector2(0,-5),TowerType.LaserTower);
+//		manager.createTowerOfType (new Vector2(0,-5),TowerType.LaserTower);
 	}
 
 	public override int initOre(){

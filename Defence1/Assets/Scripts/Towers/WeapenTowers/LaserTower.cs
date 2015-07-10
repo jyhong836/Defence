@@ -5,7 +5,7 @@ public class LaserTower : WeaponTower {
 	public LaserEffect attackingaLaser;
 
 	protected override void initAttackingControl() {
-		attackControl.init (AttackTargetType.Enemy, ()=>transform.position.toVec2 (),
+		attackControl.init (TargetType.Enemy, ()=>transform.position.toVec2 (),
 			(fire, currentTarget, firePoint, injury) => {
 				attackingaLaser.showEffect = fire;
 				if (fire) {

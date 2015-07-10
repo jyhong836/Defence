@@ -8,7 +8,7 @@ public class FireTower : WeaponTower {
 	public ParticleSystem fireSystem;
 
 	protected override void initAttackingControl() {
-		attackControl.init (AttackTargetType.Enemy, 
+		attackControl.init (TargetType.Enemy, 
 			()=>transform.position.toVec2(), 
 			(fire, currentTarget, firePoint, injury) => {
 				if (fire) {
@@ -21,21 +21,33 @@ public class FireTower : WeaponTower {
 			}, AttackTarget);
 	}
 
-	float AttackTarget () {
-		var colliders = Physics.OverlapSphere (transform.position, 
-			attackControl.attackingRadius, 
-			attackControl.targetMask);
-		if (colliders.Length > 0) {
-			foreach (var collider in colliders) {
-				var enemy = collider.gameObject.GetComponent<Enemy> ();
-				enemy.hpControl.hp -= attackControl.injury;
-			}
+	float AttackTarget (DetectingControl detectControl) {
+		if (detectControl.DetectMultiple ((HitpointControl obj) => {
+			obj.hp -= attackControl.injury;
+		}, attackControl.attackingRadius)) {
 			attackControl.isFiring = true;
-
 			return attackControl.attackInterval;
 		} else {
 			attackControl.isFiring = false;
 			return 0;
 		}
 	}
+//
+//
+//		var colliders = Physics.OverlapSphere (transform.position, 
+//			attackControl.attackingRadius, 
+//			attackControl.targetMask);
+//		if (colliders.Length > 0) {
+//			foreach (var collider in colliders) {
+//				var enemy = collider.gameObject.GetComponent<Enemy> ();
+//				enemy.hpControl.hp -= attackControl.injury;
+//			}
+//			attackControl.isFiring = true;
+//
+//			return attackControl.attackInterval;
+//		} else {
+//			attackControl.isFiring = false;
+//			return 0;
+//		}
+//	}
 }
