@@ -56,8 +56,10 @@ public class WeaponTower : Tower {
 	[SerializeField] public Transform rotationPart;
 	[SerializeField] protected float rotateSpeed = 3;
 	[SerializeField] protected float fireAngle = 0.01f;
-	
-	protected override void init(Vector2 pos){
+
+	#region init functions
+
+	protected override void init(Vector2 pos) {
 		detectControl = new DetectingControl<Enemy>(TargetType.Enemy,(o)=>o.hpControl,
 			()=>transform.position.toVec2(),
 			detectingRadius
@@ -75,20 +77,14 @@ public class WeaponTower : Tower {
 	}
 
 	protected virtual void initAttackingControl() {
-		attackControl.init (TargetType.Enemy, ()=>transform.position.toVec2(), null, null,
-			()=>detectControl.isOutOfRange(attackControl.currentTarget),
-			()=>detectControl.isOutOfRange(attackControl.currentTarget, attackControl.attackingRadius),
-			(detectedCallback)=>detectControl.DetectSingleNearest(detectedCallback),
-			()=>aimControl.ready,
-			aimControl.updateOrientation
-		);
+		initAttackingControl (null, null);
 	}
 
 	protected void initAttackingControl(
 		Action<bool> fireEffect,
 		Action<HitpointControl, float> attackAction
 	) {
-		attackControl.init (TargetType.Enemy, ()=>transform.position.toVec2(), 
+		attackControl.init (()=>transform.position.toVec2(), 
 			fireEffect, attackAction,
 			()=>detectControl.isOutOfRange(attackControl.currentTarget),
 			()=>detectControl.isOutOfRange(attackControl.currentTarget, attackControl.attackingRadius),
@@ -97,6 +93,8 @@ public class WeaponTower : Tower {
 			aimControl.updateOrientation
 		);
 	}
+
+	#endregion
 
 	void FixedUpdate () {
 		if (isAttacking) {

@@ -4,7 +4,7 @@ using System.Collections;
 public class EnemyManager : MonoBehaviour, IEnemySpawner {
 
 	public GameManager gameManager;
-	public Enemy enemyPrefab;
+	public FighterEnemy fighterEnemyPrefab;
 
 	EnemySpawnMethod method;
 	Transform enemyParent;
@@ -22,8 +22,8 @@ public class EnemyManager : MonoBehaviour, IEnemySpawner {
 	}
 
 	Enemy createEnemy(Vector2 pos) {
-		var enemy = Instantiate (enemyPrefab);
-		enemy.init(pos);
+		var enemy = Instantiate (fighterEnemyPrefab);
+		enemy.create(pos);
 
 		enemy.transform.parent = enemyParent;
 		return enemy;

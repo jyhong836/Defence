@@ -34,20 +34,10 @@ using System;
 		} 
 	}
 
-//	protected AimingControl aimControl;
 	public Func<bool> isAimedAtTarget;
 	private Action<float> updateOrientation;
 
-	/// <summary>
-	/// Init the specified armPosition, fireCallback and attackTarget.
-	/// </summary>
-	/// <param name="armPosition">Arm position.</param>
-	/// <param name="fireCallback">Fire callback. _fireCallback (HitpointControl 
-	/// currentTarget, float injury). You can set this to null for using default.</param>
-	/// <param name="attackTarget">Attack target. Should return next time interval 
-	/// You can set this to null for using default.</param>
 	public void init(
-		TargetType targetType,
 		Func<Vector2> armPosition, 
 		Action<bool> fireEffect,
 		Action<HitpointControl, float> attackAction, 
@@ -58,12 +48,7 @@ using System;
 		Action<float> updateOrientation
 	) 
 	{
-//		this.targetType = targetType;
 		this.armPosition = armPosition;
-//		if (fireCallback == null)
-//			this.fireCallback = _fireCallback;
-//		else
-//			this.fireCallback = fireCallback;
 		if (fireEffect == null)
 			this.fireEffect = (fire) => { };
 		else
@@ -111,6 +96,9 @@ using System;
 	private Action<HitpointControl, float> attackAction;
 	private Action<bool> fireEffect;
 
+	/// <summary>
+	/// Draw attacking line in debug window.
+	/// </summary>
 	public void DrawAttackLine() {
 		if (currentTarget != null && currentTarget.isAlive) {
 			var start = Vector3Extension.fromVec2(this.armPosition());

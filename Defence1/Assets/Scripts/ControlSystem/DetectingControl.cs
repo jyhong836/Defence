@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
 public enum TargetType {
 	Enemy,
@@ -65,13 +66,16 @@ public class DetectingControl<T> {
 			targetMask); // FIXME the preview model will detect too. use tag ?
 		HitpointControl currentTarget = null;
 		if (colliders.Length > 0) {
-			//random pick one
-			var index = UnityEngine.Random.Range (0, colliders.Length);
+			var targetColliders = pickTargetColliders (colliders);
+			if (targetColliders.Count > 0) {
+				//random pick one
+				int index = UnityEngine.Random.Range (0, targetColliders.Count);
 
-			currentTarget = getTarget (colliders [index].gameObject.GetComponent<T>());
-			if (currentTarget != null) {
-				detectedCallback (currentTarget);
-				return true;
+				currentTarget = getTarget (colliders [index].gameObject.GetComponent<T> ());
+				if (currentTarget != null) {
+					detectedCallback (currentTarget);
+					return true;
+				}
 			}
 		}
 		return currentTarget != null;
@@ -90,11 +94,14 @@ public class DetectingControl<T> {
 			radius, 
 			targetMask);
 		if (colliders.Length > 0) {
-			foreach (var c in colliders) {
-				var target = getTarget (c.gameObject.GetComponent<T>());
-				detectedCallback(target);
+			var targetColliders = pickTargetColliders (colliders);
+			if (targetColliders.Count > 0) {
+				foreach (var c in targetColliders) {
+					var target = getTarget (c.gameObject.GetComponent<T> ());
+					detectedCallback (target);
+				}
+				return true;
 			}
-			return true;
 		}
 		return false;
 	}
@@ -108,25 +115,38 @@ public class DetectingControl<T> {
 			detectingRadius,
 			targetMask); // FIXME the preview model will detect too. use tag ?
 		HitpointControl currentTarget = null;
-		if (colliders.Length > 0) {
-			// pick nearest one
-			int minIdx = 0;
-			float minDist = (colliders [minIdx].gameObject.getPos () - armPosition()).magnitude;
-			for (int idx = 1; idx < colliders.Length; idx++) {
-				float dist = (colliders [idx].gameObject.getPos () - armPosition()).magnitude;
-				if (dist < minDist) {
-					minDist = dist;
-					minIdx = idx;
-				}
-			}
 
-			currentTarget = getTarget (colliders [minIdx].gameObject.GetComponent<T>());
-			if (currentTarget != null) {
-				detectedCallback (currentTarget);
-				return true;
+		if (colliders.Length > 0) {
+			var targetColliders = pickTargetColliders (colliders);
+			if (targetColliders.Count > 0) {
+				// pick nearest one
+				int minIdx = 0;
+				float minDist = (colliders [minIdx].gameObject.getPos () - armPosition ()).magnitude;
+				for (int idx = 1; idx < targetColliders.Count; idx++) {
+					float dist = (colliders [idx].gameObject.getPos () - armPosition ()).magnitude;
+					if (dist < minDist) {
+						minDist = dist;
+						minIdx = idx;
+					}
+				}
+
+				currentTarget = getTarget (colliders [minIdx].gameObject.GetComponent<T> ());
+				if (currentTarget != null) {
+					detectedCallback (currentTarget);
+					return true;
+				}
 			}
 		}
 		return false;
 	}
-	
+
+	List<Collider> pickTargetColliders(Collider[] colliders) {
+		List<Collider> targetColliders = new List<Collider>();
+		foreach (var c in colliders) {
+			if (c.gameObject.tag != "Preview") {
+				targetColliders.Add (c);
+			}
+		}
+		return targetColliders;
+	}
 }
