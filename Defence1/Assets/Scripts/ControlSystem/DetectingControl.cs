@@ -7,11 +7,12 @@ public enum TargetType {
 	Tower
 }
 
-public class DetectingControl {
+public class DetectingControl<T> {
 
 	private float detectingRadius;
 
 	private TargetType targetType;
+	private Func<T, HitpointControl> getTarget;
 	public int targetMask{ 
 		get{ 
 			switch (targetType) {
@@ -28,10 +29,12 @@ public class DetectingControl {
 
 	public DetectingControl(
 		TargetType targetType,
+		Func<T, HitpointControl> getTarget,
 		Func<Vector2> armPosition,
 		float detectingRadius = 10
 	) 
 	{
+		this.getTarget = getTarget;
 		this.targetType = targetType;
 		this.armPosition = armPosition;
 		this.detectingRadius = detectingRadius;
@@ -65,7 +68,7 @@ public class DetectingControl {
 			//random pick one
 			var index = UnityEngine.Random.Range (0, colliders.Length);
 
-			currentTarget = getTarget (colliders [index].gameObject);
+			currentTarget = getTarget (colliders [index].gameObject.GetComponent<T>());
 			if (currentTarget != null) {
 				detectedCallback (currentTarget);
 				return true;
@@ -88,7 +91,7 @@ public class DetectingControl {
 			targetMask);
 		if (colliders.Length > 0) {
 			foreach (var c in colliders) {
-				var target = getTarget (c.gameObject);
+				var target = getTarget (c.gameObject.GetComponent<T>());
 				detectedCallback(target);
 			}
 			return true;
@@ -117,7 +120,7 @@ public class DetectingControl {
 				}
 			}
 
-			currentTarget = getTarget (colliders [minIdx].gameObject);
+			currentTarget = getTarget (colliders [minIdx].gameObject.GetComponent<T>());
 			if (currentTarget != null) {
 				detectedCallback (currentTarget);
 				return true;
@@ -126,22 +129,22 @@ public class DetectingControl {
 		return false;
 	}
 
-	private HitpointControl getTarget(GameObject obj) {
-		switch (targetType) {
-		case TargetType.Enemy: 
-			var enemy = obj.GetComponent<Enemy> ();
-			if (enemy.alive)
-				return enemy.hpControl;
-			break;
-		case TargetType.Tower:
-			var tower = obj.GetComponent<Tower> ();
-			if (tower.alive)
-				return tower.hpControl;
-			break;
-		default:
-			throw new UnityException ("Unknown mask: "+targetMask);
-		}
-		return null;
-	}
+//	private HitpointControl getTarget(GameObject obj) {
+//		switch (targetType) {
+//		case TargetType.Enemy: 
+//			var enemy = obj.GetComponent<Enemy> ();
+//			if (enemy.alive)
+//				return enemy.hpControl;
+//			break;
+//		case TargetType.Tower:
+//			var tower = obj.GetComponent<Tower> ();
+//			if (tower.alive)
+//				return tower.hpControl;
+//			break;
+//		default:
+//			throw new UnityException ("Unknown mask: "+targetMask);
+//		}
+//		return null;
+//	}
 	
 }

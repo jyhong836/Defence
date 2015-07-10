@@ -12,6 +12,8 @@ public class WeaponTower : Tower {
 	protected bool isAttacking = false;
 
 	public AttackingControl attackControl;
+	public DetectingControl<Enemy> detectControl;
+	public float detectingRadius = 10;
 
 	[SerializeField] protected float idlePowerUsage = 0.001f; // per sec
 	[SerializeField] protected float attackPowerUsage = 0.01f; // per sec
@@ -51,10 +53,18 @@ public class WeaponTower : Tower {
 	
 	protected override void init(Vector2 pos){
 		initAttackingControl ();
+		detectControl = new DetectingControl<Enemy>(TargetType.Enemy,(o)=>o.hpControl,
+			()=>transform.position.toVec2(),
+			detectingRadius
+		);
 	}
 
 	protected virtual void initAttackingControl() {
-		attackControl.init (TargetType.Enemy, ()=>transform.position.toVec2(), null, null);
+		attackControl.init (TargetType.Enemy, ()=>transform.position.toVec2(), null, null,
+			()=>detectControl.isOutOfRange(attackControl.currentTarget),
+			()=>detectControl.isOutOfRange(attackControl.currentTarget, attackControl.attackingRadius),
+			(detectedCallback)=>detectControl.DetectSingleNearest(detectedCallback)
+		);
 	}
 
 	void FixedUpdate () {

@@ -10,7 +10,7 @@ public class FireTower : WeaponTower {
 	protected override void initAttackingControl() {
 		attackControl.init (TargetType.Enemy, 
 			()=>transform.position.toVec2(), 
-			(fire, currentTarget, firePoint, injury) => {
+			(bool fire)=>{
 				if (fire) {
 					if (!fireSystem.isPlaying) 
 						fireSystem.Play();
@@ -18,20 +18,31 @@ public class FireTower : WeaponTower {
 					if (!fireSystem.isStopped) 
 						fireSystem.Stop();
 				}
-			}, AttackTarget);
+			}, 
+			(HitpointControl target, float injury)=>{
+				detectControl.DetectMultiple ((HitpointControl obj) => {
+					obj.hp -= injury;
+				}, attackControl.attackingRadius);
+			},
+			()=>detectControl.isOutOfRange(attackControl.currentTarget),
+			()=>detectControl.isOutOfRange(attackControl.currentTarget, attackControl.attackingRadius),
+			(detectedCallback)=>detectControl.DetectSingleNearest(detectedCallback)
+		);
 	}
 
-	float AttackTarget (DetectingControl detectControl) {
-		if (detectControl.DetectMultiple ((HitpointControl obj) => {
-			obj.hp -= attackControl.injury;
-		}, attackControl.attackingRadius)) {
-			attackControl.isFiring = true;
-			return attackControl.attackInterval;
-		} else {
-			attackControl.isFiring = false;
-			return 0;
-		}
-	}
+//	float AttackTarget (DetectingControl detectControl) {
+//		if (detectControl.DetectMultiple ((HitpointControl obj) => {
+//			obj.hp -= attackControl.injury;
+//		}, attackControl.attackingRadius)) {
+//			attackControl.isFiring = true;
+//			return attackControl.attackInterval;
+//		} else {
+//			attackControl.isFiring = false;
+//			return 0;
+//		}
+//	}
+
+
 //
 //
 //		var colliders = Physics.OverlapSphere (transform.position, 

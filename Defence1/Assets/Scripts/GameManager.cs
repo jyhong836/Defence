@@ -111,7 +111,6 @@ public class GameManager : MonoBehaviour {
 	public ConstructingTower createConstructingTower(Vector2 pos, TowerType towerType, GameObject model){
 		model.transform.parent = towerParent.transform;
 		var t = model.AddComponent<ConstructingTower> ();
-		t.create (pos); // FIXME @VPlusOne should use create or init?
 		t.init (pos, ConstructingTower.powerNeedToConstruct (towerType),
 			createTower: () => createTowerOfType (pos, towerType));
 

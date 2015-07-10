@@ -9,8 +9,8 @@ using System;
 
 [Serializable] public class AttackingControl {
 
-	HitpointControl currentTarget;
-	DetectingControl detectControl;
+	public HitpointControl currentTarget;
+//	DetectingControl<> detectControl;
 	Func<Vector2> armPosition;
 //	TargetType targetType;
 //	public int targetMask{ 
@@ -26,23 +26,25 @@ using System;
 //		} }
 
 	[SerializeField] public float attackingRadius = 8;
-	[SerializeField] public float detectingRadius = 10;
 	[SerializeField] public float injury;
 	[SerializeField] public float hitForce;
 	[SerializeField] public float attackInterval = 2;
 
 	private float nextAttackTime;
 
-	protected bool isTargetOutOfRange {
-		get {
-			return detectControl.isOutOfRange(currentTarget); // FIXME should use the attackRadus here?
-		}
-	}
+//	protected bool isTargetOutOfRange {
+//		get {
+//			return detectControl.isOutOfRange(currentTarget); // FIXME should use the attackRadus here?
+//		}
+//	}
+	private Func<bool> isTargetOutOfDetecting;
+	private Func<bool> isTargetOutOfAttacking;
+	Func<Action<HitpointControl>, bool> detectTarget;
 
 	/// <summary>
 	/// _fireCallback (bool fire, HitpointControl currentTarget, Vector3 firePoint, float injury)
 	/// </summary>
-	Action<bool, HitpointControl, Vector3, float> fireCallback;
+//	Action<bool, HitpointControl, Vector3, float> fireCallback;
 	protected bool _isFiring;
 	public bool isFiring{ 
 		get{
@@ -50,7 +52,10 @@ using System;
 		} 
 		set{
 			if (value!=_isFiring) {
-				fireCallback (value, currentTarget, rotationPart.transform.position, injury);
+//				fireCallback (value, currentTarget, rotationPart.transform.position, injury);
+				if (value)
+					attackAction(currentTarget, injury);
+				fireEffect (value);
 			}
 			_isFiring = value;
 		} 
@@ -60,10 +65,10 @@ using System;
 	/// float _attackTarget ()
 	/// return next time interval
 	/// </summary>
-	Func<DetectingControl, float> attackTarget; 
+//	Func<float> attackTarget; 
 
 	protected AimingControl aimControl;
-	[SerializeField] private Transform rotationPart;
+	[SerializeField] public Transform rotationPart;
 	[SerializeField] private float rotateSpeed = 3;
 	[SerializeField] private float fireAngle = 0.01f;
 
@@ -78,19 +83,28 @@ using System;
 	public void init(
 		TargetType targetType,
 		Func<Vector2> armPosition, 
-		Action<bool, HitpointControl, Vector3, float> fireCallback, 
-		Func<DetectingControl, float> attackTarget) 
+//		Action<bool, HitpointControl, Vector3, float> fireCallback,
+		Action<bool> fireEffect,
+		Action<HitpointControl, float> attackAction, 
+		Func<bool> isTargetOutOfDetecting,
+		Func<bool> isTargetOutOfAttacking,
+		Func<Action<HitpointControl>, bool> detectTarget
+	) 
 	{
 //		this.targetType = targetType;
 		this.armPosition = armPosition;
-		if (fireCallback == null)
-			this.fireCallback = _fireCallback;
+//		if (fireCallback == null)
+//			this.fireCallback = _fireCallback;
+//		else
+//			this.fireCallback = fireCallback;
+		if (fireEffect == null)
+			this.fireEffect = (fire) => { };
 		else
-			this.fireCallback = fireCallback;
-		if (attackTarget == null)
-			this.attackTarget = _attackTarget;
+			this.fireEffect = fireEffect;
+		if (attackAction == null)
+			this.attackAction = (HitpointControl target,float injury)=>{target.hp -= injury;};
 		else
-			this.attackTarget = attackTarget;
+			this.attackAction = attackAction;
 
 		aimControl = 
 			new HorizontalRotationAimingControl (
@@ -102,14 +116,20 @@ using System;
 			);
 		nextAttackTime = attackInterval;
 
-		detectControl = new DetectingControl (targetType,
-			armPosition, 
-			detectingRadius);
+		this.isTargetOutOfAttacking = isTargetOutOfAttacking;
+		this.isTargetOutOfDetecting = isTargetOutOfDetecting;
+		this.detectTarget = detectTarget;
+//		this.detectControl = detecControl;
+
+//		detectControl = new DetectingControl<Enemy> (targetType,
+//			( t)=>t.hpControl,
+//			armPosition, 
+//			detectingRadius);
 	}
 
 	public void Attack () {
 		if (nextAttackTime <= 0) {
-			nextAttackTime += attackTarget(detectControl);
+			nextAttackTime += attackTarget();
 		} else {
 			nextAttackTime -= Time.fixedDeltaTime;
 			isFiring = false;
@@ -120,14 +140,12 @@ using System;
 	/// Attacks the target.
 	/// </summary>
 	/// <returns>Time interval.</returns>
-	private float _attackTarget (DetectingControl detectControl) {
-		if (currentTarget == null || currentTarget.hp <= 0 || isTargetOutOfRange) {
+	private float attackTarget () {
+		if (currentTarget == null || currentTarget.hp <= 0 || isTargetOutOfDetecting()) {
 //			ChangeCurrentTarget ();
-			if (!detectControl.DetectSingleNearest ((HitpointControl hpc) => {
-				currentTarget = hpc;
-			}))
+			if (!detectTarget ((HitpointControl hpc) => {currentTarget = hpc;}))
 				currentTarget = null;
-		} else if (aimControl.ready && !detectControl.isOutOfRange(currentTarget,attackingRadius)) {
+		} else if (aimControl.ready && !isTargetOutOfAttacking()) {
 			isFiring = true;
 			return attackInterval;
 		} else if (!aimControl.ready)
@@ -136,10 +154,14 @@ using System;
 		return 0;
 	}
 
-	private void _fireCallback (bool fire, HitpointControl currentTarget, Vector3 firePoint, float injury) {
-		if (fire)
-			currentTarget.hp -= injury;
-	}
+//	private void _fireCallback (bool fire, HitpointControl currentTarget, Vector3 firePoint, float injury) {
+//		if (fire)
+//			attackAction(currentTarget, injury);
+//		fireEffect (fire);
+//	}
+
+	private Action<HitpointControl, float> attackAction;
+	private Action<bool> fireEffect;
 
 //	/// <summary>
 //	/// Changes the current target to a new enemy.
