@@ -9,13 +9,17 @@ public class CannonTower : WeaponTower {
 	protected override void initAttackingControl() {
 		attackControl.init (TargetType.Enemy,
 			()=>transform.position.toVec2(), 
-			(fire, currentTarget, firePoint, injury) => {
-				if (fire) {
-					var bullet = Instantiate(bulletPrefab);
-					bullet.init (firePoint, bulletSpeed, 
-						Vector3Extension.fromVec2(currentTarget.objectPosition), injury,
-						bulletAttackingRadius);
-				}
-			}, null);
+			(bool fire)=>{},
+			(HitpointControl target, float injury)=>{
+				var bullet = Instantiate(bulletPrefab);
+				bullet.init (attackControl.rotationPart.position,
+					bulletSpeed, 
+					Vector3Extension.fromVec2(target.objectPosition), injury,
+					bulletAttackingRadius); 
+			},
+			()=>detectControl.isOutOfRange(attackControl.currentTarget),
+			()=>detectControl.isOutOfRange(attackControl.currentTarget, attackControl.attackingRadius),
+			(detectedCallback)=>detectControl.DetectSingleNearest(detectedCallback)
+		);
 	}
 }

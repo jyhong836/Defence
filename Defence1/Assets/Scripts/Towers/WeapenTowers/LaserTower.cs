@@ -6,15 +6,21 @@ public class LaserTower : WeaponTower {
 
 	protected override void initAttackingControl() {
 		attackControl.init (TargetType.Enemy, ()=>transform.position.toVec2 (),
-			(fire, currentTarget, firePoint, injury) => {
+			(bool fire) => {
 				attackingaLaser.showEffect = fire;
-				if (fire) {
-					attackingaLaser.setEndpoints (firePoint, 
-						Vector3Extension.fromVec2(currentTarget.objectPosition));
-					currentTarget.hp -= injury;
-				}
+//				if (fire) {
+//					attackingaLaser.setEndpoints (attackControl.rotationPart.position, 
+//						Vector3Extension.fromVec2(currentTarget.objectPosition));
+//				}
 			},
-			null
+			(HitpointControl target, float injury) => {
+				attackingaLaser.setEndpoints (attackControl.rotationPart.position, 
+					Vector3Extension.fromVec2(target.objectPosition));
+				target.hp -= injury;
+			},
+			()=>detectControl.isOutOfRange(attackControl.currentTarget),
+			()=>detectControl.isOutOfRange(attackControl.currentTarget, attackControl.attackingRadius),
+			(detectedCallback)=>detectControl.DetectSingleNearest(detectedCallback)
 		);
 	}
 }
