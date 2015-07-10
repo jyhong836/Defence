@@ -17,7 +17,8 @@ public class GameManager : MonoBehaviour {
 			}
 		}
 	}
-		
+
+	public float gameSpeed = 1;
 	public float mapSize = 10f;
 	public InitializeScript initScript;
 
@@ -44,6 +45,8 @@ public class GameManager : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		Get = this; //setup singleton.
+		Time.timeScale = gameSpeed;
+		Time.fixedDeltaTime /= gameSpeed;
 
 		setupParents ();
 
