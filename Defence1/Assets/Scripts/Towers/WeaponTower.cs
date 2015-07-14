@@ -69,6 +69,11 @@ public class WeaponTower : Tower {
 	#region init functions
 
 	protected override void init(Vector2 pos) {
+		attackControl = new AttackingControl<Enemy> ();
+		attackControl.attackingRadius = attackingRadius;
+		attackControl.injury = injury;
+		attackControl.hitForce = hitForce;
+		attackControl.attackInterval = attackInterval;
 		detectControl = new DetectingControl<Enemy>(TargetType.Enemy,
 			()=>transform.position.toVec2(),
 			detectingRadius
@@ -84,11 +89,6 @@ public class WeaponTower : Tower {
 					attackControl.currentTarget.transform.position.toVec2() - 
 					transform.position.toVec2())
 			);
-		attackControl = new AttackingControl<Enemy> ();
-		attackControl.attackingRadius = attackingRadius;
-		attackControl.injury = injury;
-		attackControl.hitForce = hitForce;
-		attackControl.attackInterval = attackInterval;
 		initAttackingControl ();
 	}
 

@@ -4,7 +4,12 @@ using System.Collections;
 public abstract class EnemyParent : MonoBehaviour, IAliveable {
 
 	#region IAliveable implementation
-	public HitpointControl hpControl { get; protected set; }
+
+	public HitpointControl _hpControl;
+	public HitpointControl hpControl { 
+		get{ return _hpControl; }
+		protected set{ _hpControl = value; }
+	}
 
 	public bool destroyed { get{ return !alive;}}
 	public bool alive { get; private set;}
@@ -40,7 +45,7 @@ public abstract class EnemyParent : MonoBehaviour, IAliveable {
 	protected virtual void cleanUp(GameManager manager) {} 
 
 	protected virtual void initHpControl(){
-		hpControl = new HitpointControl ();
+//		hpControl = new HitpointControl ();
 		hpControl.init (
 			outOfHp: (value) => destroySelf (), 
 			hurtedCallback: (value) => {},
