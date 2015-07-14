@@ -12,7 +12,16 @@ public class WeaponTower : Tower {
 	
 	protected bool isAttacking = false;
 
-	public AttackingControl attackControl;
+	#region Attackable
+
+	public AttackingControl<Enemy> attackControl;
+	public float attackingRadius = 8;
+	public float injury;
+	public float hitForce;
+	public float attackInterval = 2;
+
+	#endregion
+
 	public DetectingControl<Enemy> detectControl;
 	public AimingControl aimControl;
 	public float detectingRadius = 10;
@@ -60,19 +69,26 @@ public class WeaponTower : Tower {
 	#region init functions
 
 	protected override void init(Vector2 pos) {
-		detectControl = new DetectingControl<Enemy>(TargetType.Enemy,(o)=>o.hpControl,
+		detectControl = new DetectingControl<Enemy>(TargetType.Enemy,
 			()=>transform.position.toVec2(),
 			detectingRadius
 		);
+
 		aimControl = 
 			new HorizontalRotationAimingControl (
 				rotateSpeed: () => rotateSpeed,
 				fireAngle: () => fireAngle,
 				rotateToDirection: RotationMath.RotatePart (rotationPart, 0f),
 				hasTarget: () => attackControl.currentTarget!=null,
-				targetDirection: () => RotationMath.directionOf (attackControl.currentTarget.objectPosition - 
+				targetDirection: () => RotationMath.directionOf (
+					attackControl.currentTarget.transform.position.toVec2() - 
 					transform.position.toVec2())
 			);
+		attackControl = new AttackingControl<Enemy> ();
+		attackControl.attackingRadius = attackingRadius;
+		attackControl.injury = injury;
+		attackControl.hitForce = hitForce;
+		attackControl.attackInterval = attackInterval;
 		initAttackingControl ();
 	}
 
@@ -82,7 +98,7 @@ public class WeaponTower : Tower {
 
 	protected void initAttackingControl(
 		Action<bool> fireEffect,
-		Action<HitpointControl, float> attackAction
+		Action<Enemy, float> attackAction
 	) {
 		attackControl.init (()=>transform.position.toVec2(), 
 			fireEffect, attackAction,

@@ -8,12 +8,12 @@ public enum TargetType {
 	Tower
 }
 
-public class DetectingControl<T> {
+public class DetectingControl <T> where T: MonoBehaviour, IAliveable {
 
 	private float detectingRadius;
 
 	private TargetType targetType;
-	private Func<T, HitpointControl> getTarget;
+//	private Func<T, HitpointControl> getTarget;
 	public int targetMask{ 
 		get{ 
 			switch (targetType) {
@@ -30,12 +30,12 @@ public class DetectingControl<T> {
 
 	public DetectingControl(
 		TargetType targetType,
-		Func<T, HitpointControl> getTarget,
+//		Func<T, HitpointControl> getTarget,
 		Func<Vector2> armPosition,
 		float detectingRadius = 10
 	) 
 	{
-		this.getTarget = getTarget;
+//		this.getTarget = getTarget;
 		this.targetType = targetType;
 		this.armPosition = armPosition;
 		this.detectingRadius = detectingRadius;
@@ -47,10 +47,10 @@ public class DetectingControl<T> {
 	/// <returns><c>true</c>, if target out of range, <c>false</c> otherwise.</returns>
 	/// <param name="target">HitpointControl target.</param>
 	/// <param name="radius">Radius.</param>
-	public bool isOutOfRange(HitpointControl target, float radius) {
-		return target == null || (armPosition () - target.objectPosition).magnitude > radius;
+	public bool isOutOfRange(T target, float radius) {
+		return target == null || (armPosition () - target.transform.position.toVec2()).magnitude > radius;
 	}
-	public bool isOutOfRange(HitpointControl target) {
+	public bool isOutOfRange(T target) {
 		return isOutOfRange (target, detectingRadius);
 	}
 
@@ -59,19 +59,19 @@ public class DetectingControl<T> {
 	/// </summary>
 	/// <returns><c>true</c>, if target was detected, <c>false</c> otherwise.</returns>
 	/// <param name="detectedCallback">Detected callback.</param>
-	public bool DetectSingleRandom(Action<HitpointControl> detectedCallback) {
+	public bool DetectSingleRandom(Action<T> detectedCallback) {
 		var colliders = Physics.OverlapSphere (
 			Vector3Extension.fromVec2(armPosition()),
 			detectingRadius,
 			targetMask); // FIXME the preview model will detect too. use tag ?
-		HitpointControl currentTarget = null;
+		T currentTarget = null;
 		if (colliders.Length > 0) {
 			var targetColliders = pickTargetColliders (colliders);
 			if (targetColliders.Count > 0) {
 				//random pick one
 				int index = UnityEngine.Random.Range (0, targetColliders.Count);
 
-				currentTarget = getTarget (colliders [index].gameObject.GetComponent<T> ());
+				currentTarget = colliders [index].gameObject.GetComponent<T> ();
 				if (currentTarget != null) {
 					detectedCallback (currentTarget);
 					return true;
@@ -87,7 +87,7 @@ public class DetectingControl<T> {
 	/// <returns><c>true</c>, if multiple was detected, <c>false</c> otherwise.</returns>
 	/// <param name="detectedCallback">Detected callback.</param>
 	/// <param name="radius">Radius.</param>
-	public bool DetectMultiple(Action<HitpointControl> detectedCallback, 
+	public bool DetectMultiple(Action<T> detectedCallback, 
 		float radius) {
 		var colliders = Physics.OverlapSphere (
 			Vector3Extension.fromVec2(armPosition()), 
@@ -97,7 +97,7 @@ public class DetectingControl<T> {
 			var targetColliders = pickTargetColliders (colliders);
 			if (targetColliders.Count > 0) {
 				foreach (var c in targetColliders) {
-					var target = getTarget (c.gameObject.GetComponent<T> ());
+					var target = c.gameObject.GetComponent<T> ();
 					detectedCallback (target);
 				}
 				return true;
@@ -105,16 +105,16 @@ public class DetectingControl<T> {
 		}
 		return false;
 	}
-	public bool DetectMultiple(Action<HitpointControl> detectedCallback) {
+	public bool DetectMultiple(Action<T> detectedCallback) {
 		return DetectMultiple (detectedCallback, detectingRadius);
 	}
 
-	public bool DetectSingleNearest(Action<HitpointControl> detectedCallback) {
+	public bool DetectSingleNearest(Action<T> detectedCallback) {
 		var colliders = Physics.OverlapSphere (
 			Vector3Extension.fromVec2(armPosition()),
 			detectingRadius,
 			targetMask); // FIXME the preview model will detect too. use tag ?
-		HitpointControl currentTarget = null;
+		T currentTarget = null;
 
 		if (colliders.Length > 0) {
 			var targetColliders = pickTargetColliders (colliders);
@@ -130,7 +130,7 @@ public class DetectingControl<T> {
 					}
 				}
 
-				currentTarget = getTarget (colliders [minIdx].gameObject.GetComponent<T> ());
+				currentTarget = colliders [minIdx].gameObject.GetComponent<T> ();
 				if (currentTarget != null) {
 					detectedCallback (currentTarget);
 					return true;

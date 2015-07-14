@@ -2,21 +2,22 @@
 using System.Collections;
 using System;
 
-[Serializable] public class AttackingControl {
+public class AttackingControl <T> where T: MonoBehaviour, IAliveable {
 
-	public HitpointControl currentTarget;
+//	public HitpointControl currentTarget;
+	public T currentTarget;
 	Func<Vector2> armPosition;
 
-	[SerializeField] public float attackingRadius = 8;
-	[SerializeField] public float injury;
-	[SerializeField] public float hitForce;
-	[SerializeField] public float attackInterval = 2;
+	public float attackingRadius = 8;
+	public float injury;
+	public float hitForce;
+	public float attackInterval = 2;
 
 	private float nextAttackTime;
 
 	private Func<bool> isTargetOutOfDetecting;
 	private Func<bool> isTargetOutOfAttacking;
-	Func<Action<HitpointControl>, bool> detectTarget;
+	Func<Action<T>, bool> detectTarget;
 
 	protected bool _isFiring;
 	public bool isFiring{ 
@@ -40,10 +41,10 @@ using System;
 	public void init(
 		Func<Vector2> armPosition, 
 		Action<bool> fireEffect,
-		Action<HitpointControl, float> attackAction, 
+		Action<T, float> attackAction, 
 		Func<bool> isTargetOutOfDetecting,
 		Func<bool> isTargetOutOfAttacking,
-		Func<Action<HitpointControl>, bool> detectTarget,
+		Func<Action<T>, bool> detectTarget,
 		Func<bool> isAimedAtTarget,
 		Action<float> updateOrientation
 	) 
@@ -54,7 +55,7 @@ using System;
 		else
 			this.fireEffect = fireEffect;
 		if (attackAction == null)
-			this.attackAction = (HitpointControl target,float injury)=>{target.hp -= injury;};
+			this.attackAction = (T target,float injury)=>{target.hpControl.hp -= injury;};
 		else
 			this.attackAction = attackAction;
 		
@@ -81,8 +82,8 @@ using System;
 	/// </summary>
 	/// <returns>Time interval.</returns>
 	private float attackTarget () {
-		if (currentTarget == null || currentTarget.hp <= 0 || isTargetOutOfDetecting()) {
-			if (!detectTarget ((HitpointControl hpc) => {currentTarget = hpc;}))
+		if (currentTarget == null || currentTarget.hpControl.hp <= 0 || isTargetOutOfDetecting()) {
+			if (!detectTarget ((T target) => {currentTarget = target;}))
 				currentTarget = null;
 		} else if (isAimedAtTarget() && !isTargetOutOfAttacking()) {
 			isFiring = true;
@@ -93,16 +94,16 @@ using System;
 		return 0;
 	}
 
-	private Action<HitpointControl, float> attackAction;
+	private Action<T, float> attackAction;
 	private Action<bool> fireEffect;
 
 	/// <summary>
 	/// Draw attacking line in debug window.
 	/// </summary>
 	public void DrawAttackLine() {
-		if (currentTarget != null && currentTarget.isAlive) {
+		if (currentTarget != null && currentTarget.alive) {
 			var start = Vector3Extension.fromVec2(this.armPosition());
-			var end = Vector3Extension.fromVec2(currentTarget.objectPosition);
+			var end = currentTarget.transform.position;
 			if (isAimedAtTarget()) {
 				if (isFiring)
 					Debug.DrawLine (start, end, Color.red);

@@ -9,10 +9,10 @@ public class LaserTower : WeaponTower {
 			(bool fire) => {
 				attackingaLaser.showEffect = fire;
 			},
-			(HitpointControl target, float injury) => {
+			(Enemy target, float injury) => {
 				attackingaLaser.setEndpoints (rotationPart.position, 
-					Vector3Extension.fromVec2(target.objectPosition));
-				target.hp -= injury;
+					target.transform.position);
+				target.hpControl.hp -= injury;
 			}
 		);
 	}

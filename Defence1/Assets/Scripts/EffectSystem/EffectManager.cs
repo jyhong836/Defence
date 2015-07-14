@@ -82,7 +82,7 @@ public class EffectManager : MonoBehaviour {
 			drawRange (center, Miner.workingRadius, miningConnectionColor);
 		}else if (t is WeaponTower){
 			var weap = t as WeaponTower;
-			drawRange (center, weap.attackControl.attackingRadius, attackingConnectionColor);
+			drawRange (center, weap.attackingRadius, attackingConnectionColor);
 		}
 	}
 
