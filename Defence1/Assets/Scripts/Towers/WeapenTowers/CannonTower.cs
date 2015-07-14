@@ -14,7 +14,9 @@ public class CannonTower : WeaponTower {
 				bullet.init (rotationPart.position,
 					bulletSpeed, 
 					target.transform.position, injury,
-					bulletAttackingRadius); 
+					bulletAttackingRadius,
+					hitForce
+				); 
 			}
 		);
 	}

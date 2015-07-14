@@ -13,6 +13,9 @@ public class LaserTower : WeaponTower {
 				attackingaLaser.setEndpoints (rotationPart.position, 
 					target.transform.position);
 				target.hpControl.hp -= injury;
+				target.hitBack(
+					(target.transform.position - transform.position).normalized*hitForce
+				);
 			}
 		);
 	}

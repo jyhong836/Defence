@@ -10,9 +10,10 @@ public class Bullet : MonoBehaviour {
 	private Vector2 originPos;
 	private float injury;
 	private float attackingRadius;
+	float hitForce;
 
 	public void init(Vector3 position, float speed, Vector3 target, float injury,
-	                 float attackingRadius) {
+		float attackingRadius, float hitForce) {
 		originPos = new Vector2 (position.x, position.z);;
 
 		this.transform.position = position;
@@ -25,6 +26,7 @@ public class Bullet : MonoBehaviour {
 
 		this.injury = injury;
 		this.attackingRadius = attackingRadius;
+		this.hitForce = hitForce;
 	}
 
 	void FixedUpdate() {
@@ -45,6 +47,9 @@ public class Bullet : MonoBehaviour {
 				var enemy = collider.gameObject.GetComponent<Enemy> ();
 //				enemy.lifeLeft -= injury;
 				enemy.hpControl.hp -= injury;
+				enemy.hitBack (
+					(enemy.transform.position - transform.position).normalized*hitForce
+				);
 //				Debug.Log ("hurt enemy"+enemy.hpControl.hp);
 			}
 		}

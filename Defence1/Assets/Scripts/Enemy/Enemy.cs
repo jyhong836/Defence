@@ -82,7 +82,7 @@ public class Enemy : EnemyParent {
 	}
 
 
-	protected virtual void hitBack(Vector3 force) {
+	public virtual void hitBack(Vector3 force) {
 		_rigidbody.AddForce (force);
 	}
 
