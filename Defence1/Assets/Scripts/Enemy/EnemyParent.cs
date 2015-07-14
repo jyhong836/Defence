@@ -1,24 +1,21 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public abstract class EnemyParent : MonoBehaviour {
+public abstract class EnemyParent : MonoBehaviour, IAliveable {
 
-	public HitpointControl hpControl;
+	#region IAliveable implementation
+
+	public HitpointControl _hpControl;
+	public HitpointControl hpControl { 
+		get{ return _hpControl; }
+		protected set{ _hpControl = value; }
+	}
 
 	public bool destroyed { get{ return !alive;}}
 	public bool alive { get; private set;}
 
-//	[SerializeField] protected float searchingRadius = 10;
-//	[SerializeField] protected float attackingRadus = 5; // TODO add attacking code
-//
-//	public HitpointControl hpControl;
-//	protected Rigidbody _rigidbody;
-//
-//	public float attackInterval = 2;
-//	protected float nextAttackTime;
-//
-//	protected WeaponTower currentTarget;
-//
+	#endregion
+
 	public void create(Vector2 pos) {
 		initParent (pos);
 		init (pos);
@@ -48,36 +45,11 @@ public abstract class EnemyParent : MonoBehaviour {
 	protected virtual void cleanUp(GameManager manager) {} 
 
 	protected virtual void initHpControl(){
+//		hpControl = new HitpointControl ();
 		hpControl.init (
 			outOfHp: (value) => destroySelf (), 
 			hurtedCallback: (value) => {},
 			objectPosition: ()=>transform.position.toVec2()
 		);
 	}
-
-//	protected virtual void hitBack(Vector3 force) {
-//		_rigidbody.AddForce (force);
-//	}
-//
-//	// Use this for initialization
-//	void Start () {
-//		_rigidbody = GetComponent<Rigidbody> ();
-//		initMovement ();
-//		ChangeCurrentTarget ();
-//		nextAttackTime = attackInterval;
-//	}
-//
-//	protected virtual void initMovement() {}
-//
-//	protected void ChangeCurrentTarget () {
-//		var colliders = Physics.OverlapSphere (transform.position,searchingRadius,Masks.Tower);
-//		if (colliders.Length > 0) {
-//			//random pick one
-//			var index = UnityEngine.Random.Range (0, colliders.Length);
-//			var tower = colliders [index].gameObject.GetComponent <WeaponTower>();
-//			currentTarget = tower;
-//		} else {
-//			currentTarget = null;
-//		}
-//	}
 }

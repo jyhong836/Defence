@@ -9,12 +9,14 @@ public class CannonTower : WeaponTower {
 	protected override void initAttackingControl() {
 		initAttackingControl (
 			(bool fire)=>{},
-			(HitpointControl target, float injury)=>{
+			(Enemy target, float injury)=>{
 				var bullet = Instantiate(bulletPrefab);
 				bullet.init (rotationPart.position,
 					bulletSpeed, 
-					Vector3Extension.fromVec2(target.objectPosition), injury,
-					bulletAttackingRadius); 
+					target.transform.position, injury,
+					bulletAttackingRadius,
+					hitForce
+				); 
 			}
 		);
 	}

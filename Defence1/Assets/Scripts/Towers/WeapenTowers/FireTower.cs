@@ -18,9 +18,9 @@ public class FireTower : WeaponTower {
 						fireSystem.Stop ();
 				}
 			}, 
-			(HitpointControl target, float injury) => {
-				detectControl.DetectMultiple ((HitpointControl obj) => {
-					obj.hp -= injury;
+			(Enemy target, float injury) => {
+				detectControl.DetectMultiple ((Enemy obj) => {
+					obj.hpControl.hp -= injury;
 				}, attackControl.attackingRadius);
 			}
 		);
