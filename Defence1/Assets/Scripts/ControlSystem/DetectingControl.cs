@@ -63,7 +63,7 @@ public class DetectingControl <T> where T: MonoBehaviour, IAliveable {
 		var colliders = Physics.OverlapSphere (
 			Vector3Extension.fromVec2(armPosition()),
 			detectingRadius,
-			targetMask); // FIXME the preview model will detect too. use tag ?
+			targetMask);
 		T currentTarget = null;
 		if (colliders.Length > 0) {
 			var targetColliders = pickTargetColliders (colliders);
@@ -113,7 +113,7 @@ public class DetectingControl <T> where T: MonoBehaviour, IAliveable {
 		var colliders = Physics.OverlapSphere (
 			Vector3Extension.fromVec2(armPosition()),
 			detectingRadius,
-			targetMask); // FIXME the preview model will detect too. use tag ?
+			targetMask);
 		T currentTarget = null;
 
 		if (colliders.Length > 0) {

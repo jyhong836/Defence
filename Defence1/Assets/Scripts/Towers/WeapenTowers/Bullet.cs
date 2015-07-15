@@ -12,17 +12,16 @@ public class Bullet : MonoBehaviour {
 	private float attackingRadius;
 	float hitForce;
 
-	public void init(Vector3 position, float speed, Vector3 target, float injury,
+	public void init(Vector3 position, float speed, Vector3 targetPos, float injury,
 		float attackingRadius, float hitForce) {
 		originPos = new Vector2 (position.x, position.z);;
 
 		this.transform.position = position;
-		this.direction = target - position;
+		this.direction = targetPos - position;
 		distance = direction.magnitude;
 		direction.Normalize ();
+		this.transform.Rotate(new Vector3(90, RotationMath.directionOf(new Vector2(direction.x, direction.z))*RotationMath.rand2Deg,0));
 		direction *= speed;
-		// FIXME the bullet direction is wront. maybe the front vec should be modified
-		this.transform.Rotate(new Vector3(0, RotationMath.directionOf(new Vector2(direction.x, direction.z)),0));
 
 		this.injury = injury;
 		this.attackingRadius = attackingRadius;

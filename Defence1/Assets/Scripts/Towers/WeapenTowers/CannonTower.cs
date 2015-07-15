@@ -11,9 +11,11 @@ public class CannonTower : WeaponTower {
 			(bool fire)=>{},
 			(Enemy target, float injury)=>{
 				var bullet = Instantiate(bulletPrefab);
-				bullet.init (rotationPart.position,
+				bullet.init (
+					transform.position,
 					bulletSpeed, 
-					target.transform.position, injury,
+					target.transform.position, 
+					injury,
 					bulletAttackingRadius,
 					hitForce
 				); 

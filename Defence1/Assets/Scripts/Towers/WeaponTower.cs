@@ -131,7 +131,7 @@ public class WeaponTower : Tower {
 
 	// Use this for initialization
 	void Start () {
-		isAttacking = true; // FIXME attack start at begining
+		isAttacking = true; // FIXME attack start at begining?
 	}
 	
 	// Update is called once per frame
