@@ -5,6 +5,7 @@ public class CannonTower : WeaponTower {
 	public Bullet bulletPrefab;
 	public float bulletSpeed;
 	public float bulletAttackingRadius;
+	public float bulletMaxDistance = 200;
 
 	protected override void initAttackingControl() {
 		initAttackingControl (
@@ -17,7 +18,8 @@ public class CannonTower : WeaponTower {
 					target.transform.position, 
 					injury,
 					bulletAttackingRadius,
-					hitForce
+					hitForce,
+					bulletMaxDistance
 				); 
 			}
 		);

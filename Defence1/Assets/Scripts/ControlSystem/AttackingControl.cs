@@ -85,7 +85,10 @@ public class AttackingControl <T> where T: MonoBehaviour, IAliveable {
 		if (currentTarget == null || currentTarget.hpControl.hp <= 0 || isTargetOutOfDetecting()) {
 			if (!detectTarget ((T target) => {currentTarget = target;}))
 				currentTarget = null;
-		} else if (isAimedAtTarget() && !isTargetOutOfAttacking()) {
+//			else if (currentTarget.hpControl.hp>0) {
+//				attackTarget();
+//			}
+		} else if (!isTargetOutOfAttacking() && isAimedAtTarget()) {
 			isFiring = true;
 			return attackInterval;
 		} else if (!isAimedAtTarget())

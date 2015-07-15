@@ -100,13 +100,15 @@ public class WeaponTower : Tower {
 		Action<bool> fireEffect,
 		Action<Enemy, float> attackAction
 	) {
-		attackControl.init (()=>transform.position.toVec2(), 
-			fireEffect, attackAction,
-			()=>detectControl.isOutOfRange(attackControl.currentTarget),
-			()=>detectControl.isOutOfRange(attackControl.currentTarget, attackControl.attackingRadius),
-			(detectedCallback)=>detectControl.DetectSingleNearest(detectedCallback),
-			()=>aimControl.ready,
-			aimControl.updateOrientation
+		attackControl.init (
+			armPosition: () => transform.position.toVec2 (), 
+			fireEffect: fireEffect,
+			attackAction: attackAction, 
+			isTargetOutOfDetecting: () => detectControl.isOutOfRange (attackControl.currentTarget),
+			isTargetOutOfAttacking: () => detectControl.isOutOfRange (attackControl.currentTarget, attackControl.attackingRadius),
+			detectTarget: (detectedCallback) => detectControl.DetectSingleNearest (detectedCallback),
+			isAimedAtTarget: () => aimControl.ready,
+			updateOrientation: aimControl.updateOrientation
 		);
 	}
 
